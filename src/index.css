@@ -1,0 +1,36 @@
+@import "tailwindcss";
+@import "./styles/field.css";
+@import "./styles/button.css";
+
+:root {
+  --bg-body: #0F1117;
+  --main-text: #F4F5F7;
+  --bg-field: #1D212B;
+  --bg-card: #171A22;
+  --bg-button: #6366F1;
+  --spacing: 16px;
+}
+
+html {
+  font-size: var(--spacing);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-body);
+  color: var(--main-text);
+}
+
+.main__container{
+  width: 50%;
+  margin: 3rem auto;
+}
+
+.panel {
+  padding: 1rem;
+  background-color: var(--bg-card);
+  border-radius: 0.5rem;
+}
