@@ -1,0 +1,42 @@
+{
+    "ui": {
+        "text": {
+            "button": {
+                "result": "Показать результаты"
+            }
+        },
+        "style": {
+            "button": {
+                "result": {
+                    "color": "white",
+                    "hoverColor": "white",
+                    "backgroundColor": "#453EFF",
+                    "backgroundHoverColor": "#4751FF"
+                }
+            }
+        }
+    },
+    "steps": [
+        {
+            "type": "optionButton",
+            "answers": [
+                {},
+                {}
+            ],
+            "question": [
+                {},
+                {}
+            ]
+        }
+    ],
+    "result": {
+        "items": [
+            {}    
+        ],
+        "isRetakeEnabled": true,
+        "canScrollToFirstError": false,
+        "shouldShowScoreCounter": true
+    },
+    "stepAlign": "vertical",
+    "shouldRevealAnswersResult": true
+}

@@ -2,7 +2,7 @@ import Label from "./Label";
 
 const Textarea = (props) => {
     const {
-        label,
+        ariaLabel,
         placeholder,
         heightArea,
         value,
@@ -13,9 +13,7 @@ const Textarea = (props) => {
     } = props;
     return(
         <textarea className={`field ${classname}`}
-            placeholder={ placeholder } 
-            aria-label={ label } 
-            rows={ heightArea } 
+            placeholder={ placeholder } aria-label={ ariaLabel } rows={ heightArea } 
             id={ id } name={ name } value={ value } readOnly={ readOnly }></textarea>
     )
 }

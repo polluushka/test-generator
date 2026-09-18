@@ -1,0 +1,19 @@
+{
+   "items": [
+        {
+            "min": 0,
+            "title": "",
+            "imageUrl": "",
+            "description": ""
+        },
+        {
+            "min": 0,
+            "title": "",
+            "imageUrl": "",
+            "description": ""
+        }
+    ],
+   "isRetakeEnabled": true,
+   "canScrollToFirstError": false,
+   "shouldShowScoreCounter": true
+}

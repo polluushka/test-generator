@@ -3,15 +3,16 @@ import Label from "./Label";
 const Input = (props) => {
     const {
         label,
+        ariaLabel,
         placeholder,
-        // classname,
+        type,
         id,
         name
     } = props;
     return (
         <>
-            <Label forInput={ id }>{ label }</Label>
-            <input type="text" placeholder={ placeholder } className="field h-3" id={ id } name={ name } />
+            { label !== undefined && (<Label forInput={ id }>{ label }</Label>) }
+            <input className="field h-3" placeholder={ placeholder } type={ type } aria-label={ ariaLabel ? ariaLabel : label } id={ id } name={ name } />
         </>
     )
 }
