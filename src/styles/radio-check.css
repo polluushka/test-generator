@@ -1,0 +1,140 @@
+/* SEGMENTED CONTROL */
+
+.seg {
+    display: flex;
+    align-items: center;
+
+    width: fit-content;
+
+    padding: 3px;
+
+    background: var(--field);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+
+/* Каждый пункт */
+
+.seg .label__radio {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 34px;
+    padding: 8px 13px;
+
+    border-radius: 7px;
+
+    color: var(--text-dim);
+
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1;
+
+    cursor: pointer;
+    user-select: none;
+
+    white-space: nowrap;
+
+    transition:
+        background .15s ease,
+        color .15s ease;
+}
+
+/* Убираем настоящий radio */
+
+.seg .radio__input {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+
+    margin: -1px;
+    padding: 0;
+
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Hover */
+
+.seg .label__radio:hover {
+    color: var(--text);
+}
+
+/* ACTIVE */
+
+.seg .label__radio:has(.radio__input:checked) {
+    color: var(--text);
+    background: var(--field-raised);
+}
+
+/* QUESTION TYPE */
+
+.type-row {
+    display: flex;
+    align-items: center;
+
+    margin-top: 4px;
+}
+
+/* TRUTH */
+
+.truth {
+    display: flex;
+    align-items: center;
+
+    gap: 6px;
+}
+
+.truth .label__radio {
+    min-height: 32px;
+    padding: 7px 11px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 8px;
+
+    background: var(--field);
+}
+
+/* Верно */
+
+.truth .label__radio:has(
+    .radio__input[value="true"]:checked
+) {
+    color: var(--correct);
+
+    border-color: rgba(62, 207, 142, .25);
+    background: rgba(62, 207, 142, .08);
+}
+
+/* Неверно */
+
+.truth .label__radio:has(
+    .radio__input[value="false"]:checked
+) {
+    color: var(--text);
+
+    border-color: var(--border-strong);
+    background: var(--field-raised);
+}
+
+/* Hover */
+
+.truth .label__radio:hover {
+    background: var(--field-raised);
+}
+
+/* FOCUS */
+
+.seg .label__radio:has(.radio__input:focus-visible) {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}
+

@@ -10,8 +10,12 @@ const Radio = (props) => {
 
     return(
         <>
-            <input className="mr-0.5" type="radio" id={ id } name={ name } value={ value } />
-            <Label forInput={ id }>{ children }</Label>
+            <Label forInput={ id } classLabel="label__radio">
+                <input className="radio__input" type="radio" id={ id } name={ name } value={ value } />
+                { children }
+            </Label>
+            
+            
         </>
     )
 }

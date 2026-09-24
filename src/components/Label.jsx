@@ -1,10 +1,11 @@
 const Label = (props) => {
     const {
         children,
-        forInput
+        forInput,
+        classLabel
     } = props;
     return(
-        <label htmlFor={ forInput } className="label__field">{ children }</label>
+        <label htmlFor={ forInput } className={ classLabel }>{ children }</label>
     )
 }
 

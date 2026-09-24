@@ -5,7 +5,7 @@ const Panel = (props) => {
      } = props;
 
     return(
-        <div className={`panel ${classname}`}>
+        <div className="panel">
             { children }
         </div>
     )

@@ -7,12 +7,15 @@ const Input = (props) => {
         placeholder,
         type,
         id,
-        name
+        name,
+        onInput,
+        value
     } = props;
     return (
         <>
-            { label !== undefined && (<Label forInput={ id }>{ label }</Label>) }
-            <input className="field h-3" placeholder={ placeholder } type={ type } aria-label={ ariaLabel ? ariaLabel : label } id={ id } name={ name } />
+            { label !== undefined && (<Label classLabel="field-label" forInput={ id }>{ label }</Label>) }
+            <input className="input" placeholder={ placeholder } type={ type } value={ value }
+                aria-label={ ariaLabel ? ariaLabel : label } id={ id } name={ name } onInput={ onInput } />
         </>
     )
 }

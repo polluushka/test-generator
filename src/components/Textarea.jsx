@@ -4,17 +4,15 @@ const Textarea = (props) => {
     const {
         ariaLabel,
         placeholder,
-        heightArea,
         value,
-        classname,
         id,
         name,
-        readOnly
+        readOnly,
+        onInput
     } = props;
     return(
-        <textarea className={`field ${classname}`}
-            placeholder={ placeholder } aria-label={ ariaLabel } rows={ heightArea } 
-            id={ id } name={ name } value={ value } readOnly={ readOnly }></textarea>
+        <textarea className="textarea" placeholder={ placeholder } aria-label={ ariaLabel }
+            id={ id } name={ name } value={ value } readOnly={ readOnly } onInput={ onInput }></textarea>
     )
 }
 
