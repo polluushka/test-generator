@@ -43,8 +43,6 @@
         color .15s ease;
 }
 
-/* Убираем настоящий radio */
-
 .seg .radio__input {
     position: absolute;
 
@@ -105,22 +103,16 @@
 
 /* Верно */
 
-.truth .label__radio:has(
-    .radio__input[value="true"]:checked
-) {
+.truth .label__radio:has(.radio__input[value="true"]:checked) {
     color: var(--correct);
-
     border-color: rgba(62, 207, 142, .25);
     background: rgba(62, 207, 142, .08);
 }
 
 /* Неверно */
 
-.truth .label__radio:has(
-    .radio__input[value="false"]:checked
-) {
+.truth .label__radio:has(.radio__input[value="false"]:checked) {
     color: var(--text);
-
     border-color: var(--border-strong);
     background: var(--field-raised);
 }

@@ -11,19 +11,14 @@ import DeleteButton from './components/DeleteButton';
 import PrimaryButton from './components/PrimaryButton';
 import CopyButton from './components/CopyButton';
 
-// import template from './data/template.json'
-import step_json from './data/step-template.json'
-import answer_json from './data/answer-template.json'
-import result_json from './data/result-template.json'
-import item_result_json from './data/item-result-template.json'
-import template_json from './data/template.json'
+import stepTemplate from './data/step-template.json'
+import answerTemplate from './data/answer-template.json'
+import answerTailTemplate from './data/answer-tail-template.json'
+import resultTemplate from './data/result-template.json'
+import itemResultTemplate from './data/item-result-template.json'
+import templateJSON from './data/template.json'
 
 function App() {
-  const stepTemplate = step_json;
-  const answerTemplate = answer_json;
-  const resultTemplate = result_json;
-  const itemResultTemplate = item_result_json;
-  const templateJSON = template_json;
 
   const [dataQuestionsAnswers, setDataQuestionsAnswers] = useState([stepTemplate]);
   const [dataResult, setDataResult] = useState(resultTemplate);
@@ -37,17 +32,17 @@ function App() {
     ]);
   }
 
-  function addAnswer(index) {
+  function addAnswer(indexQuestion) {
     setDataQuestionsAnswers(prev => {
-      const question = [...prev];
-      question[index] = {
-        ...question[index],
+      const questions = [...prev];
+      questions[indexQuestion] = {
+        ...questions[indexQuestion],
         answers: [
-          ...question[index].answers,
-          answerTemplate
+          ...questions[indexQuestion].answers,
+          questions[indexQuestion].type === "optionButton" ? answerTemplate : answerTailTemplate
         ]
       };
-      return question;
+      return questions;
     })
   }
 
@@ -197,6 +192,17 @@ function App() {
     return combinedText;
   }
 
+  function changeTypeQuestion(indexQuestion, typeQuestion) {
+    setDataQuestionsAnswers(prev => {
+      return prev.map((step, stepIndex) => {
+        return {
+          ...step, 
+          type: stepIndex === indexQuestion ? typeQuestion : step.type
+        }
+      })
+    })
+  }
+
   function handleSubmit(event) {
     event.preventDefault();
 
@@ -209,28 +215,38 @@ function App() {
 
         type: data[`type_question${index_step + 1}`] === "tile" ? "tile" : "optionButton",
 
-        answers: step.answers.map((answer, index_answer) => ({
-          ...answer,
-          title: data[`question${index_step + 1}_answer${index_answer + 1}`],
-          isCorrect: data[`isCorrect_question${index_step + 1}_answer${index_answer + 1}`] === "true",
-          description: data[`question${index_step + 1}_answer${index_answer + 1}_description`]
-        })),
+        answers: (data[`type_question${index_step + 1}`] !== undefined 
+          ? data[`type_question${index_step + 1}`] : step.type) === "optionButton"
+            ? step.answers.map((answer, index_answer) => ({
+                ...answer,
+                title: data[`question${index_step + 1}_answer${index_answer + 1}`],
+                isCorrect: data[`isCorrect_question${index_step + 1}_answer${index_answer + 1}`] === "true",
+                description: data[`question${index_step + 1}_answer${index_answer + 1}_description`]
+              }))
+            : step.answers.map((_, index_answer) => ({
+                isCorrect: data[`isCorrect_question${index_step + 1}_answer${index_answer + 1}`] === "true",
+                description: data[`question${index_step + 1}_answer${index_answer + 1}_description`],
+                backgroundUrl: `https://opis-cdn.tinkoffjournal.ru/mercury/${data[`imgAnswer${index_answer + 1}`].name}`,
+                reactionImageUrl: data[`isCorrect_question${index_step + 1}_answer${index_answer + 1}`] === "true"
+                      ? "https://opis-cdn.tinkoffjournal.ru/mercury/D2t-lz8bxw.Like.png"
+                      : "https://opis-cdn.tinkoffjournal.ru/mercury/7iyV9K3XGD.dislike.png"
+              })),
 
-        question: data[`img${index_step + 1}`].name ? 
+        question: data[`imgQuestion${index_step + 1}`].name ? 
           [
             {
               text: data[`question${index_step + 1}`],
-              type: "description"
+              type: "title"
             },
             {
-              "url": `https://opis-cdn.tinkoffjournal.ru/mercury/${data[`img${index_step + 1}`].name}`,
+              "url": `https://opis-cdn.tinkoffjournal.ru/mercury/${data[`imgQuestion${index_step + 1}`].name}`,
               "size": "fullWidth",
               "type": "image"
             }
           ] : [
             {
               text: data[`question${index_step + 1}`],
-              type: "description"
+              type: "title"
             }
           ]
       }));
@@ -256,6 +272,16 @@ function App() {
     navigator.clipboard.writeText(
       dataConfigEmpty ? "" : JSON.stringify(dataConfig, null, 2)
     );
+  }
+
+  function formatEnding(colQuestion) {
+    const n = colQuestion % 10;
+
+    if (colQuestion % 100 >= 11 && colQuestion % 100 <= 19) return colQuestion + " вопросов";
+    if (n === 1) return colQuestion + " вопрос";
+    if (n >= 2 && n <= 4) return colQuestion + " вопроса";
+
+    return colQuestion + " вопросов";
   }
 
   useEffect(() => {
@@ -293,7 +319,7 @@ function App() {
         <div className="spacer"></div>
 
         <span className="ghost-tag" id="counter">
-          {dataQuestionsAnswers.length} вопросов
+          { formatEnding(dataQuestionsAnswers.length) }
         </span>
       </header>
 
@@ -321,17 +347,18 @@ function App() {
                   </div>
 
                   <div className="stack">
-                    <InputFile label="Картинка к вопросу" id={`img${questionNumber}`} name={`img${questionNumber}`} />
+                    <span className="field-label">Вид вопроса</span>
+                    <InputFile label="Картинка к вопросу" id={`imgQuestion${questionNumber}`} name={`imgQuestion${questionNumber}`} />
                   </div>
 
                   <div className="type-row">
+                    <span className="field-label" style={{ margin: 0 }}>Вид вопроса</span>
                     <div className="seg">
-                      <Radio id={`optionButton_question${questionNumber}`}
+                      <Radio id={`optionButton_question${questionNumber}`} onClick={ () => changeTypeQuestion(index_question, "optionButton") }
                         name={`type_question${questionNumber}`} value="optionButton">Плашки</Radio>
 
-                      <Radio id={`tile_question${questionNumber}`}
-                        name={`type_question${questionNumber}`} value="tile">Тайлы (в разработке)</Radio>
-
+                      <Radio id={`tile_question${questionNumber}`} onClick={ () => changeTypeQuestion(index_question, "tile") }
+                        name={`type_question${questionNumber}`} value="tile">Тайлы</Radio>
                     </div>
                   </div>
 
@@ -346,11 +373,17 @@ function App() {
                       return (
                         <div key={`question-panel-${index_question}-answer-${index_answer}`} className="answer">
 
-                          <div className="stack">
-                            <Input placeholder="Введите вариант ответа..." type="text" label={`Ответ ${answerNumber}`} value={answer.title}
-                              id={`question${questionNumber}_answer${answerNumber}`} name={`question${questionNumber}_answer${answerNumber}`} 
-                              onInput={ (event) => enterDataQuestionsAnswers(event, index_question, index_answer, "answer") }/>
-                          </div>
+                          {
+                            question.type === "optionButton"
+                            ? <div className="stack">
+                                <Input placeholder="Введите вариант ответа..." type="text" label={`Ответ ${answerNumber}`} value={answer.title}
+                                  id={`question${questionNumber}_answer${answerNumber}`} name={`question${questionNumber}_answer${answerNumber}`} 
+                                  onInput={ (event) => enterDataQuestionsAnswers(event, index_question, index_answer, "answer") }/>
+                              </div>
+                            : <div className="stack">
+                                <InputFile label="Картинка к результату" id={`imgAnswer${answerNumber}`} name={`imgAnswer${answerNumber}`} />
+                              </div>
+                          }
 
                           <div className="stack">
                             <Textarea readOnly={false} placeholder="Введите описание ответа..." heightArea="5"
