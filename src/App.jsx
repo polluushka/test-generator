@@ -37,6 +37,8 @@ function App() {
     deleteResult
   } = useResults();
 
+  const [dataConfig, setDataConfig] = useState(templateJSON);
+  const [dataConfigEmpty, setDataConfigEmpty] = useState(true);
   const [modalVisibility, setModalVisibility] = useState(false);
   const [selectionValue, setSelectionValue] = useState("");
   const [focusElem, setFocusElem] = useState({
