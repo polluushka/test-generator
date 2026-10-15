@@ -367,7 +367,10 @@ function App() {
                   <div className="q-head">
                     <span className="q-index">{resultNumber}</span>
                     <h2>Результат</h2>
-                    <DeleteButton type="button" className="del" onClick={() => deleteResult(index_result)}>Удалить</DeleteButton>
+                    {
+                      dataResult.items.length > 1
+                        ? <DeleteButton type="button" className="del" onClick={() => deleteResult(index_result)}>Удалить</DeleteButton> : ""
+                    }
                   </div>
 
                   <div className="result-grid">
