@@ -7,8 +7,23 @@ export function useQuestionsAnswers() {
 
     function addQuestion() {
         setDataQuestionsAnswers(prev => [
-        ...prev,
-        stepTemplate
+            ...prev,
+            {        
+                type: "optionButton",  
+                answers: Array.from({ length: 2 }, () => ({
+                        ...(prev[0].type === "optionButton"
+                            ? { title: "" } : "isCorrect" in prev[0].answers[0]
+                                ? { backgroundUrl: "", reactionImageUrl: "" } : { backgroundUrl: "" }),
+
+                        ...("isCorrect" in prev[0].answers[0] ? { isCorrect: false } : { score: 0 }),
+
+                        description: ""
+                    })
+                ),
+                question: [
+                    { text: "", type: "title" }
+                ]
+            }
         ]);
     }
 
@@ -25,10 +40,7 @@ export function useQuestionsAnswers() {
                         : "isCorrect" in questions[indexQuestion].answers[0]
                             ? { backgroundUrl: "", reactionImageUrl: "" } : { backgroundUrl: "" }
                     ),
-                    ...("isCorrect" in questions[indexQuestion].answers[0]
-                    ? { isCorrect: false }
-                    : { score: 0 }
-                    ),
+                    ...("isCorrect" in questions[indexQuestion].answers[0] ? { isCorrect: false } : { score: 0 } ),
                     description: ""
                 }
                 ]
@@ -126,29 +138,27 @@ export function useQuestionsAnswers() {
         }));
     }
 
-    function changeTypeAnswer(indexQuestion, typeAnswer) {
+    function changeTypeAnswer(typeTest) {
         setDataQuestionsAnswers(prev => {
-            return prev.map((step, stepIndex) => {
-                if (stepIndex === indexQuestion) {
-                    return {
-                        ...step, 
-                        answers: step.answers.map(answer => {
-                            const { isCorrect, score, reactionImageUrl, ...rest } = answer;
-                            if (typeAnswer === "trueAnswerType") {
-                                if (step.type === "tile") {
-                                    return { 
-                                        ...rest, 
-                                        isCorrect: false, 
-                                        reactionImageUrl: answer.reactionImageUrl ?? "https://opis-cdn.tinkoffjournal.ru/mercury/7iyV9K3XGD.dislike.png" 
-                                    }
+            return prev.map(step => {
+                return {
+                    ...step, 
+                    answers: step.answers.map(answer => {
+                        const { isCorrect, score, reactionImageUrl, ...rest } = answer;
+                        if (typeTest === "quiz") {
+                            if (step.type === "tile") {
+                                return { 
+                                    ...rest, 
+                                    isCorrect: false, 
+                                    reactionImageUrl: answer.reactionImageUrl ?? "https://opis-cdn.tinkoffjournal.ru/mercury/7iyV9K3XGD.dislike.png" 
                                 }
-                                return { ...rest, isCorrect: false }
                             }
-                            return { ...rest, score: 0 }
-                        })
-                    }
+                            return { ...rest, isCorrect: false }
+                        }
+                        return { ...rest, score: 0 }
+                    })
                 }
-                return step;
+                // return step;
             })
         })
     }

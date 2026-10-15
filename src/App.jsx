@@ -255,18 +255,6 @@ function App() {
                           name={`typeQuestion${questionNumber}`} value="tile" checked={ question.type === "tile" }>Тайлы</Radio>
                       </div>
                     </div>
-
-                    <div className="type-row">
-                      <span className="field-label" style={{ margin: 0 }}>Тип ответов</span>
-                      <div className="seg">
-                        <Radio id={`trueA${questionNumber}`} onChange={ () => changeTypeAnswer(index_question, "trueAnswerType") }
-                          name={`typeAnswer${questionNumber}`} value="trueAnswerType" checked={ "isCorrect" in question.answers[0] }>Квиз</Radio>
-
-                        <Radio id={`noneTrueA${questionNumber}`} onChange={ () => changeTypeAnswer(index_question, "noneTrueAnswerType") }
-                          name={`typeAnswer${questionNumber}`} value="noneTrueAnswerType" checked={ "score" in question.answers[0] }>Стратегия</Radio>
-                      </div>
-                    </div>
-
                   </div>
 
                   <div className="section-title" style={{ marginBottom: "16px" }}>Варианты ответа</div>
@@ -422,12 +410,24 @@ function App() {
         <aside className="side">
 
           <Panel classname="panel meta">
+            
             <div className="stack">
               <Input type="text" placeholder="Введите название..." label="Название теста" id="name" name="name" readOnly={ false } />
             </div>
 
             <div className="stack">
               <Input type="text" placeholder="/slug-test" label="Слаг" id="slug" name="slug" readOnly={ false } />
+            </div>
+
+            <div className="type-row">
+              <span className="field-label" style={{ margin: 0 }}>Тип теста</span>
+              <div className="seg">
+                <Radio id="quiz" onChange={ (event) => changeTypeAnswer(event.target.value) }
+                  name="typeTest" value="quiz" checked={ "isCorrect" in dataQuestionsAnswers[0].answers[0] }>Квиз</Radio>
+
+                <Radio id="strategy" onChange={ (event) => changeTypeAnswer(event.target.value) }
+                  name="typeTest" value="strategy" checked={ "score" in dataQuestionsAnswers[0].answers[0] }>Стратегия</Radio>
+              </div>
             </div>
 
             <PrimaryButton type="submit" form="test-generator-form">Сгенерировать конфиг</PrimaryButton>
