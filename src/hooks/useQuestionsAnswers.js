@@ -33,16 +33,16 @@ export function useQuestionsAnswers() {
             questions[indexQuestion] = {
                 ...questions[indexQuestion],
                 answers: [
-                ...questions[indexQuestion].answers,
-                {
-                    ...(questions[indexQuestion].type === "optionButton"
-                        ? { title: "" }
-                        : "isCorrect" in questions[indexQuestion].answers[0]
-                            ? { backgroundUrl: "", reactionImageUrl: "" } : { backgroundUrl: "" }
-                    ),
-                    ...("isCorrect" in questions[indexQuestion].answers[0] ? { isCorrect: false } : { score: 0 } ),
-                    description: ""
-                }
+                    ...questions[indexQuestion].answers,
+                    {
+                        ...(questions[indexQuestion].type === "optionButton"
+                            ? { title: "" }
+                            : "isCorrect" in questions[indexQuestion].answers[0]
+                                ? { backgroundUrl: "", reactionImageUrl: "https://opis-cdn.tinkoffjournal.ru/mercury/7iyV9K3XGD.dislike.png" } : { backgroundUrl: "" }
+                        ),
+                        ...("isCorrect" in questions[indexQuestion].answers[0] ? { isCorrect: false } : { score: 0 } ),
+                        description: ""
+                    }
                 ]
             };
             return questions;
@@ -66,13 +66,13 @@ export function useQuestionsAnswers() {
                         return {
                             ...rest,
                             ...(eventTarget.name === `typeQuestion${indexQuestion + 1}`
-                                ? (eventTarget.value === "optionButton" 
-                                    ? { title: "" } 
+                                ? (eventTarget.value === "optionButton"
+                                    ? { title: answer.title ?? "" } 
                                     : ("isCorrect" in answer 
                                         ? { backgroundUrl: "", reactionImageUrl: "https://opis-cdn.tinkoffjournal.ru/mercury/7iyV9K3XGD.dislike.png" }
                                         : { backgroundUrl: "" }
                                     )
-                                ) : {}),   
+                                ) : answer),   
                         }
                     }), 
 
