@@ -8,11 +8,12 @@ const Textarea = (props) => {
         id,
         name,
         readOnly,
-        onInput
+        onInput,
+        onFocus
     } = props;
     return(
         <textarea className="textarea" placeholder={ placeholder } aria-label={ ariaLabel }
-            id={ id } name={ name } value={ value } readOnly={ readOnly } onInput={ onInput }></textarea>
+            id={ id } name={ name } value={ value } readOnly={ readOnly } onInput={ onInput } onFocus={ onFocus }></textarea>
     )
 }
 

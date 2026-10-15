@@ -1,18 +1,25 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Label from "./Label";
 
 const InputFile = (props) => {
 
     const {
         id,
-        name    
+        name,
+        onInput,
+        nameImage
     } = props;
 
     const [titleImg, setTitleImg] = useState("Файл не выбран");
 
-    function getTitleImg(file) {
-        setTitleImg(file.files[0].name);
+    function getTitleImg(image) {
+        if(!image) return;
+        setTitleImg(image);
     }
+
+    useEffect(() => {
+        getTitleImg(nameImage);
+    }, [nameImage]);
 
     return(
         <>
@@ -26,7 +33,8 @@ const InputFile = (props) => {
                 <span className="up-text"><b>{ titleImg }</b><br/>
                     <em>Файл нужно залить в mercury с этим же именем</em>
                 </span>
-                <input type="file" id={ id } name={ name } onChange={ (event) => getTitleImg(event.target) } hidden />
+                <input type="file" id={ id } name={ name } onChange={ () => getTitleImg(nameImage) } hidden
+                    onInput={ onInput } />
             </Label>
         </>
         

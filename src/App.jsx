@@ -1,173 +1,48 @@
-import { useEffect, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 
 import Panel from './components/Panel';
 import Input from './components/Input';
 import Textarea from './components/Textarea';
 import Radio from './components/Radio';
 import InputFile from './components/InputFile';
+import Modal from './components/Modal';
 
 import AddButton from './components/AddButton';
 import DeleteButton from './components/DeleteButton';
 import PrimaryButton from './components/PrimaryButton';
 import CopyButton from './components/CopyButton';
 
-import stepTemplate from './data/step-template.json'
-import answerTemplate from './data/answer-template.json'
-import answerTailTemplate from './data/answer-tail-template.json'
-import resultTemplate from './data/result-template.json'
-import itemResultTemplate from './data/item-result-template.json'
 import templateJSON from './data/template.json'
+
+import { useQuestionsAnswers } from './hooks/useQuestionsAnswers';
+import { useResults } from './hooks/useResults';
 
 function App() {
 
-  const [dataQuestionsAnswers, setDataQuestionsAnswers] = useState([stepTemplate]);
-  const [dataResult, setDataResult] = useState(resultTemplate);
-  const [dataConfig, setDataConfig] = useState(templateJSON);
-  const [dataConfigEmpty, setDataConfigEmpty] = useState(true);
+  const {
+    dataQuestionsAnswers,
+    addQuestion,
+    addAnswer,
+    enterDataQuestionsAnswers,
+    deleteQuestion,
+    deleteAnswer,
+    // changeTypeQuestion,
+    changeTypeAnswer
+  } = useQuestionsAnswers();
 
-  function addQuestion() {
-    setDataQuestionsAnswers(prev => [
-      ...prev,
-      stepTemplate
-    ]);
-  }
+  const {
+    dataResult,
+    addResult,
+    enterDataResult,
+    deleteResult
+  } = useResults();
 
-  function addAnswer(indexQuestion) {
-    setDataQuestionsAnswers(prev => {
-      const questions = [...prev];
-      questions[indexQuestion] = {
-        ...questions[indexQuestion],
-        answers: [
-          ...questions[indexQuestion].answers,
-          questions[indexQuestion].type === "optionButton" ? answerTemplate : answerTailTemplate
-        ]
-      };
-      return questions;
-    })
-  }
-
-  function addResult() {
-    setDataResult(prev => {
-      return {
-        ...prev,
-        items: [
-          ...prev.items,
-          itemResultTemplate
-        ]
-      };
-    })
-  }
-
-  function enterDataQuestionsAnswers(event, index_question, index_answer, field) {
-    const value = event.target.value;
-    
-    setDataQuestionsAnswers(prev =>
-      prev.map((q, qIndex) => {
-
-        if(qIndex !== index_question) return q;
-
-        if(field === "question") {
-          return({
-              ...q,
-              question: [
-                {
-                  ...q.question?.[0],
-                  text: value
-                }
-              ]
-            }
-          )
-        }
-
-        if(field === "answer") {
-          return({
-              ...q,
-              answers: q.answers.map((a, aIndex) => aIndex === index_answer 
-              ? {
-                  ...a,
-                  title: value
-                } : a
-            )}
-          )
-        }
-
-        return({
-              ...q,
-              answers: q.answers.map((a, aIndex) => aIndex === index_answer 
-              ? {
-                  ...a,
-                  description: value
-                } : a
-            )}
-          )
-      })
-    );
-  }
-
-  function enterDataResult(event, index_result, field) {
-    const value = event.target.value;
-    
-    setDataResult(prev => {
-
-      if(field === "result") {
-        return {
-          ...prev,
-          items: prev.items.map((item, index_item) => index_item === index_result 
-            ? {
-              ...item,
-              title: value
-            } : item
-          )
-        }        
-      }
-
-      if(field === "resultDescription") {
-        return {
-          ...prev,
-          items: prev.items.map((item, index_item) => index_item === index_result 
-            ? {
-              ...item,
-              description: value
-            } : item
-          )
-        }  
-      }
-
-      return {
-        ...prev,
-        items: prev.items.map((item, index_item) => index_item === index_result 
-          ? {
-            ...item,
-            min: value
-          } : item
-        )
-      }
-      
-    });
-  }
-
-  function deleteQuestion(index_question) {
-    setDataQuestionsAnswers(prev => prev.filter((step, index_step) => index_step !== index_question));
-  }
-
-  function deleteAnswer(index_question, index_answer) {
-    setDataQuestionsAnswers(prev => 
-      prev.map((step, index_step) => {
-        return index_step === index_question ? {
-          ...step,
-          answers: step.answers.filter((_, index_step_answer) => index_step_answer !== index_answer)
-        } : step;
-      }));
-  }
-
-  function deleteResult(index_result) {
-    setDataResult(prev => {
-      return {
-        ...prev,
-        items: prev.items.filter((item, itemIndex) => itemIndex !== index_result)
-      }
-    });
-  }
+  const [modalVisibility, setModalVisibility] = useState(false);
+  const [selectionValue, setSelectionValue] = useState("");
+  const [focusElem, setFocusElem] = useState({
+    type: "",
+    id: ""
+  });
 
   function processText(text) {
     const regExpList = /^\d*\.\s*/;
@@ -192,79 +67,63 @@ function App() {
     return combinedText;
   }
 
-  function changeTypeQuestion(indexQuestion, typeQuestion) {
-    setDataQuestionsAnswers(prev => {
-      return prev.map((step, stepIndex) => {
-        return {
-          ...step, 
-          type: stepIndex === indexQuestion ? typeQuestion : step.type
-        }
-      })
-    })
-  }
+  // function createLink(event) {
+  //   event.preventDefault();
+
+  //   const form = new FormData(event.target);
+  //   const data = Object.fromEntries(form);
+
+  //   if(focusElem.type === "answer") {
+
+  //     const descriptionAnswer = dataQuestionsAnswers[focusElem.id[0]].answers[focusElem.id[1]].description;
+  //     const indexSubstrDescription = descriptionAnswer.indexOf(selectionValue);
+  //     const substrDescription = descriptionAnswer.slice(indexSubstrDescription, indexSubstrDescription + selectionValue.length);
+  //     const descriptionLink = `<a href="${data.link_input}">` + substrDescription + "</a>";
+  //     setDataQuestionsAnswers(prev => {
+  //       const questions = [...prev];
+  //       questions[focusElem.id[0]].answers[focusElem.id[1]] = {
+  //         ...prev,
+  //         description: descriptionLink
+  //       }
+  //       return questions;
+  //     })
+  //   }
+  // }
 
   function handleSubmit(event) {
     event.preventDefault();
 
-    const form = new FormData(event.target);
-    const data = Object.fromEntries(form);
-
-    setDataQuestionsAnswers(prev => {
-      return prev.map((step, index_step) => ({
-        ...step,
-
-        type: data[`type_question${index_step + 1}`] === "tile" ? "tile" : "optionButton",
-
-        answers: (data[`type_question${index_step + 1}`] !== undefined 
-          ? data[`type_question${index_step + 1}`] : step.type) === "optionButton"
-            ? step.answers.map((answer, index_answer) => ({
-                ...answer,
-                title: data[`question${index_step + 1}_answer${index_answer + 1}`],
-                isCorrect: data[`isCorrect_question${index_step + 1}_answer${index_answer + 1}`] === "true",
-                description: data[`question${index_step + 1}_answer${index_answer + 1}_description`]
-              }))
-            : step.answers.map((_, index_answer) => ({
-                isCorrect: data[`isCorrect_question${index_step + 1}_answer${index_answer + 1}`] === "true",
-                description: data[`question${index_step + 1}_answer${index_answer + 1}_description`],
-                backgroundUrl: `https://opis-cdn.tinkoffjournal.ru/mercury/${data[`imgAnswer${index_answer + 1}`].name}`,
-                reactionImageUrl: data[`isCorrect_question${index_step + 1}_answer${index_answer + 1}`] === "true"
-                      ? "https://opis-cdn.tinkoffjournal.ru/mercury/D2t-lz8bxw.Like.png"
-                      : "https://opis-cdn.tinkoffjournal.ru/mercury/7iyV9K3XGD.dislike.png"
-              })),
-
-        question: data[`imgQuestion${index_step + 1}`].name ? 
-          [
-            {
-              text: data[`question${index_step + 1}`],
-              type: "title"
-            },
-            {
-              "url": `https://opis-cdn.tinkoffjournal.ru/mercury/${data[`imgQuestion${index_step + 1}`].name}`,
-              "size": "fullWidth",
-              "type": "image"
+    setDataConfig(prev => {
+        const config = {
+          ...prev, 
+          steps: dataQuestionsAnswers.map(step => {
+            return {
+              ...step,
+              answers: step.answers.map(answer => {
+                return "score" in answer 
+                  ? {
+                    ...answer,
+                    score: Number(answer.score)
+                  } : answer
+              })
             }
-          ] : [
-            {
-              text: data[`question${index_step + 1}`],
-              type: "title"
-            }
-          ]
-      }));
-    }); 
-    setDataResult(prev => {
-      const result = {
-        ...prev,
-        items: prev.items.map((item, index_item) => ({
-          ...item,
-          min: data[`result${index_item + 1}_min`],
-          title: data[`result${index_item + 1}`],
-          imageUrl: data[`imgResult${index_item + 1}`].name.length > 0 
-            ? `https://opis-cdn.tinkoffjournal.ru/mercury/${data[`imgResult${index_item + 1}`].name}` : "",
-          description: data[`result${index_item + 1}_description`]
-        }))
-      }
-      return result;
-    }); 
+          }),
+          result: {
+            items: dataResult.items.map(item => {
+              return {
+                ...item, 
+                min: Number(item.min),
+                description: processText(item.description)
+              }
+            }),
+            isRetakeEnabled: dataResult.isRetakeEnabled,
+            canScrollToFirstError: dataResult.canScrollToFirstError,
+            shouldShowScoreCounter: dataResult.shouldShowScoreCounter
+          }
+        }
+        return config
+      });
+
     setDataConfigEmpty(false);
   }
 
@@ -284,29 +143,55 @@ function App() {
     return colQuestion + " вопросов";
   }
 
-  useEffect(() => {
-      setDataConfig(prev => {
-        const config = {
-          ...prev, 
-          steps: dataQuestionsAnswers,
-          result: {
-            items: dataResult.items.map(item => {
-              return {
-                ...item, 
-                description: processText(item.description)
-              }
-            }),
-            isRetakeEnabled: dataResult.isRetakeEnabled,
-            canScrollToFirstError: dataResult.canScrollToFirstError,
-            shouldShowScoreCounter: dataResult.shouldShowScoreCounter
-          }
-        }
-        return config
-      });
-  }, [dataQuestionsAnswers, dataResult])
+  // useEffect(() => {
+  //   const toogleModal = (event) => {
+  //     if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === "k") {
+  //       setModalVisibility(prev => prev === false ? true : false);
+  //       setSelectionValue(window.getSelection().toString());
+  //     }
+  //   }
+
+  //   window.addEventListener("keydown", toogleModal);
+
+  //   return() => {
+  //     window.removeEventListener("keydown", toogleModal);
+  //   }
+  // }, []);
+
+  // useEffect(() => {
+  //   console.log(dataQuestionsAnswers)
+  // }, [dataQuestionsAnswers]);
+
+  // useEffect(() => {
+  //   console.log(dataResult)
+  // }, [dataResult]);
+  
 
   return (
     <div className="app">
+      {
+        modalVisibility === true 
+        ? <Modal>
+            <Panel>
+              <h2>Создание ссылки</h2>
+
+              <form id="create-link-form" onSubmit={ (event) => createLink(event) }>
+                <div className="stack">
+                  <Input type="text" placeholder="" label="Текст ссылки"
+                  id="text_link_input" name="text_link_input" value={ selectionValue } readOnly={ true } />
+                </div>
+
+                <div className="stack">
+                  <Input type="text" placeholder="Введите ссылку..." label="Ссылка"
+                  id="link_input" name="link_input" readOnly={ false } />
+                </div>
+
+                <PrimaryButton>Создать</PrimaryButton>
+              </form>
+            </Panel>
+          </Modal> : ""
+      }
+      
       <header className="topbar">
         <div className="brand">
           <span className="mark">Т</span>
@@ -337,29 +222,49 @@ function App() {
                   <div className="q-head">
                     <span className="q-index">{questionNumber}</span>
                     <h2>Вопрос</h2>
-                    <DeleteButton type="button" onClick={() => deleteQuestion(index_question)}>Удалить</DeleteButton>
+                    {
+                      dataQuestionsAnswers.length > 1
+                        ? <DeleteButton type="button" onClick={() => deleteQuestion(index_question)}>Удалить</DeleteButton> : ""
+                    }
+                    
                   </div>
 
                   <div className="stack">
-                    <Input type="text" placeholder="Введите вопрос..." label="Текст вопроса"
+                    <Input type="text" placeholder="Введите вопрос..." label="Текст вопроса" readOnly={ false }
                       id={`question${questionNumber}`} name={`question${questionNumber}`} value={question.question[0].text}
-                      onInput={(event) => enterDataQuestionsAnswers(event, index_question, undefined, "question") } />
+                      onInput={ (event) => enterDataQuestionsAnswers(event, index_question, undefined) } />
                   </div>
 
                   <div className="stack">
-                    <span className="field-label">Вид вопроса</span>
-                    <InputFile label="Картинка к вопросу" id={`imgQuestion${questionNumber}`} name={`imgQuestion${questionNumber}`} />
+                    <span className="field-label">Картинка к вопросу</span>
+                    <InputFile label="Картинка к вопросу" id={`imgQuestion${questionNumber}`} name={`imgQuestion${questionNumber}`}
+                      onInput={ (event) => enterDataQuestionsAnswers(event, index_question, undefined) } 
+                      nameImage={ question.question[1] ? question.question[1].url.split("/").at(-1) : "Файл не выбран"} />
                   </div>
 
-                  <div className="type-row">
-                    <span className="field-label" style={{ margin: 0 }}>Вид вопроса</span>
-                    <div className="seg">
-                      <Radio id={`optionButton_question${questionNumber}`} onClick={ () => changeTypeQuestion(index_question, "optionButton") }
-                        name={`type_question${questionNumber}`} value="optionButton">Плашки</Radio>
+                  <div className="answers">
+                    <div className="type-row">
+                      <span className="field-label" style={{ margin: 0 }}>Вид вопроса</span>
+                      <div className="seg">
+                        <Radio id={`optionButton_q${questionNumber}`} onChange={ (event) => enterDataQuestionsAnswers(event, index_question) }
+                          name={`typeQuestion${questionNumber}`} value="optionButton" checked={ question.type === "optionButton" }>Плашки</Radio>
 
-                      <Radio id={`tile_question${questionNumber}`} onClick={ () => changeTypeQuestion(index_question, "tile") }
-                        name={`type_question${questionNumber}`} value="tile">Тайлы</Radio>
+                        <Radio id={`tile_q${questionNumber}`} onChange={ (event) => enterDataQuestionsAnswers(event, index_question) }
+                          name={`typeQuestion${questionNumber}`} value="tile" checked={ question.type === "tile" }>Тайлы</Radio>
+                      </div>
                     </div>
+
+                    <div className="type-row">
+                      <span className="field-label" style={{ margin: 0 }}>Правильный ответ</span>
+                      <div className="seg">
+                        <Radio id={`trueA${questionNumber}`} onChange={ () => changeTypeAnswer(index_question, "trueAnswerType") }
+                          name={`typeAnswer${questionNumber}`} value="trueAnswerType" checked={ "isCorrect" in question.answers[0] }>Есть</Radio>
+
+                        <Radio id={`noneTrueA${questionNumber}`} onChange={ () => changeTypeAnswer(index_question, "noneTrueAnswerType") }
+                          name={`typeAnswer${questionNumber}`} value="noneTrueAnswerType" checked={ "score" in question.answers[0] }>Нет</Radio>
+                      </div>
+                    </div>
+
                   </div>
 
                   <div className="section-title" style={{ marginBottom: "16px" }}>Варианты ответа</div>
@@ -377,33 +282,62 @@ function App() {
                             question.type === "optionButton"
                             ? <div className="stack">
                                 <Input placeholder="Введите вариант ответа..." type="text" label={`Ответ ${answerNumber}`} value={answer.title}
-                                  id={`question${questionNumber}_answer${answerNumber}`} name={`question${questionNumber}_answer${answerNumber}`} 
-                                  onInput={ (event) => enterDataQuestionsAnswers(event, index_question, index_answer, "answer") }/>
+                                  readOnly={ false } id={`q${questionNumber}_a${answerNumber}`} 
+                                  name={`q${questionNumber}_a${answerNumber}`} 
+                                  onInput={ (event) => enterDataQuestionsAnswers(event, index_question, index_answer) }/>
                               </div>
                             : <div className="stack">
-                                <InputFile label="Картинка к результату" id={`imgAnswer${answerNumber}`} name={`imgAnswer${answerNumber}`} />
+                                <InputFile label="Тайл" id={`img_q${questionNumber}_a${answerNumber}`} name={`img_q${questionNumber}_a${answerNumber}`}
+                                  onInput={ (event) => enterDataQuestionsAnswers(event, index_question, index_answer) } 
+                                  nameImage={ "backgroundUrl" in answer && answer.backgroundUrl.length > 0 
+                                    ? answer.backgroundUrl.split("/").at(-1) : "Файл не выбран" } />
                               </div>
                           }
 
                           <div className="stack">
                             <Textarea readOnly={false} placeholder="Введите описание ответа..." heightArea="5"
                               ariaLabel={`Описание варианта ответа ${answerNumber}`} value={answer.description}
-                              id={`question${questionNumber}_answer${answerNumber}_description`} name={`question${questionNumber}_answer${answerNumber}_description`}
-                              onInput={(event) => enterDataQuestionsAnswers(event, index_question, index_answer, "answerDescription") } />
+                              id={`q${questionNumber}_a${answerNumber}_description`} name={`q${questionNumber}_a${answerNumber}_description`}
+                              onFocus={ () => { 
+                                setFocusElem({
+                                  type: "answer",
+                                  id: [index_question, index_answer]
+                                })} 
+                              }
+                              onInput={ (event) => enterDataQuestionsAnswers(event, index_question, index_answer) } />
                           </div>
 
+                          {
+                            "score" in answer
+                            ? <div className="stack">
+                                <div className="min-badge">
+                                  <Input type="number" placeholder="0" ariaLabel="Балл" readOnly={ false }
+                                    id={`score_q${questionNumber}_a${answerNumber}`} name={`score_q${questionNumber}_a${answerNumber}`}
+                                    onInput={ (event) => enterDataQuestionsAnswers(event, index_question, index_answer) } value={answer.score} />
+                                    <small>балл</small>
+                                  </div>
+                              </div> : ""
+                          }
+
                           <div className="a-foot">
+                            
+                            {
+                              "isCorrect" in answer
+                              ? <div className="seg truth">
+                                  <Radio value="true" id={`true_q${questionNumber}_a${answerNumber}`}
+                                    name={`isCorrect_q${questionNumber}_a${answerNumber}`} checked={ answer.isCorrect === true }
+                                    onChange={ (event) => enterDataQuestionsAnswers(event, index_question, index_answer) }>Верно</Radio>
 
-                            <div className="seg truth">
-                              <Radio value="true" id={`true_question${questionNumber}_answer${answerNumber}`}
-                                name={`isCorrect_question${questionNumber}_answer${answerNumber}`}>Верно</Radio>
-                              <Radio value="false" id={`false_question${questionNumber}_answer${answerNumber}`}
-                                name={`isCorrect_question${questionNumber}_answer${answerNumber}`}>Неверно</Radio>
-                            </div>
+                                  <Radio value="false" id={`false_q${questionNumber}_a${answerNumber}`}
+                                    name={`isCorrect_q${questionNumber}_a${answerNumber}`} checked={ answer.isCorrect === false } 
+                                    onChange={ (event) => enterDataQuestionsAnswers(event, index_question, index_answer) }>Неверно</Radio>
+                                </div>
+                              : ""
+                            }
 
-                            {question.answers.length > 1 && (
-                              <DeleteButton type="button" className="del" onClick={() => deleteAnswer(index_question, index_answer) }>Удалить</DeleteButton>
-                            )}
+                            { question.answers.length > 1 && (
+                              <DeleteButton type="button" className="del" onClick={() => deleteAnswer(index_question, index_answer) }>Удалить</DeleteButton>)
+                            }
                           </div>
                         </div>
                       );
@@ -436,7 +370,7 @@ function App() {
 
                   <div className="result-grid">
                     <div className="min-badge">
-                      <Input type="number" placeholder="0" ariaLabel="Минимальный балл"
+                      <Input type="number" placeholder="0" ariaLabel="Минимальный балл" readOnly={ false }
                         id={`result${resultNumber}_min`} name={`result${resultNumber}_min`}
                         onInput={(event) => enterDataResult(event, index_result, "min") } value={result.min} />
                       <small>мин. балл</small>
@@ -445,18 +379,28 @@ function App() {
                     <div className="res-fields">
                       <div className="stack">
                         <Input type="text" placeholder="Введите название результата..." label={`Результат ${resultNumber}`}
-                          id={`result${resultNumber}`} name={`result${resultNumber}`} value={result.title}
+                          id={`result${resultNumber}`} name={`result${resultNumber}`} value={result.title} readOnly={ false }
                           onInput={(event) => enterDataResult(event, index_result, "result") } />
                       </div>
 
                       <div className="stack">
                         <Textarea readOnly={false} placeholder="Введите описание результата..." heightArea="5"
                           ariaLabel={`Описание результата ${resultNumber}`} id={`result${resultNumber}_description`} value={result.description}
+                          onFocus={ () => { 
+                            setFocusElem({
+                              type: "result",
+                              id: index_result
+                            })} 
+                          }
                           name={`result${resultNumber}_description`} onInput={(event) => enterDataResult(event, index_result, "resultDescription") } />
                       </div>
 
                       <div className="stack">
-                        <InputFile label="Картинка к результату" id={`imgResult${resultNumber}`} name={`imgResult${resultNumber}`} />
+                        <InputFile label="Картинка к результату" id={`imgResult${resultNumber}`} name={`imgResult${resultNumber}`}
+                          onInput={ (event) => enterDataResult(event, index_result) } 
+                          nameImage={ "imageUrl" in result && result.imageUrl.length > 0 
+                            ? result.imageUrl.split("/").at(-1) : "Файл не выбран" }
+                        />
                       </div>
                     </div>
                   </div>
@@ -474,11 +418,11 @@ function App() {
 
           <Panel classname="panel meta">
             <div className="stack">
-              <Input type="text" placeholder="Введите название..." label="Название теста" id="name" name="name" />
+              <Input type="text" placeholder="Введите название..." label="Название теста" id="name" name="name" readOnly={ false } />
             </div>
 
             <div className="stack">
-              <Input type="text" placeholder="/slug-test" label="Слаг" id="slug" name="slug" />
+              <Input type="text" placeholder="/slug-test" label="Слаг" id="slug" name="slug" readOnly={ false } />
             </div>
 
             <PrimaryButton type="submit" form="test-generator-form">Сгенерировать конфиг</PrimaryButton>
@@ -500,9 +444,7 @@ function App() {
               name="config" readOnly={true} value={ dataConfigEmpty ? "" : JSON.stringify(dataConfig, null, 2) } />
 
           </Panel>
-
         </aside>
-
       </div>
     </div>
   )

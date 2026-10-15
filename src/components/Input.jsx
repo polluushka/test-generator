@@ -9,13 +9,16 @@ const Input = (props) => {
         id,
         name,
         onInput,
-        value
+        onFocus,
+        value,
+        readOnly
     } = props;
     return (
         <>
             { label !== undefined && (<Label classLabel="field-label" forInput={ id }>{ label }</Label>) }
             <input className="input" placeholder={ placeholder } type={ type } value={ value }
-                aria-label={ ariaLabel ? ariaLabel : label } id={ id } name={ name } onInput={ onInput } />
+                aria-label={ ariaLabel ? ariaLabel : label } id={ id } name={ name } onInput={ onInput }
+                onFocus={ onFocus } readOnly={ readOnly } />
         </>
     )
 }

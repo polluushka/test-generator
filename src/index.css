@@ -2,6 +2,7 @@
 @import "./styles/fields.css";
 @import "./styles/buttons.css";
 @import "./styles/radio-check.css";
+@import "./styles/modal.css";
 
 :root {
   --bg: #0e0f11;
@@ -92,7 +93,10 @@ button {
 
 .app {
   min-height: 100vh;
+  max-width: 1920px;
+  margin: auto;
   background: var(--bg);
+  position: relative;
 }
 
 
