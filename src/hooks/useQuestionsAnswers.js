@@ -135,8 +135,14 @@ export function useQuestionsAnswers() {
                         answers: step.answers.map(answer => {
                             const { isCorrect, score, reactionImageUrl, ...rest } = answer;
                             if (typeAnswer === "trueAnswerType") {
-                                if (step.type === "tile") return { ...rest, isCorrect: false }
-                                return { ...rest, isCorrect: false, reactionImageUrl: answer.reactionImageUrl }
+                                if (step.type === "tile") {
+                                    return { 
+                                        ...rest, 
+                                        isCorrect: false, 
+                                        reactionImageUrl: answer.reactionImageUrl ?? "https://opis-cdn.tinkoffjournal.ru/mercury/7iyV9K3XGD.dislike.png" 
+                                    }
+                                }
+                                return { ...rest, isCorrect: false }
                             }
                             return { ...rest, score: 0 }
                         })

@@ -257,13 +257,13 @@ function App() {
                     </div>
 
                     <div className="type-row">
-                      <span className="field-label" style={{ margin: 0 }}>Правильный ответ</span>
+                      <span className="field-label" style={{ margin: 0 }}>Тип ответов</span>
                       <div className="seg">
                         <Radio id={`trueA${questionNumber}`} onChange={ () => changeTypeAnswer(index_question, "trueAnswerType") }
-                          name={`typeAnswer${questionNumber}`} value="trueAnswerType" checked={ "isCorrect" in question.answers[0] }>Есть</Radio>
+                          name={`typeAnswer${questionNumber}`} value="trueAnswerType" checked={ "isCorrect" in question.answers[0] }>Квиз</Radio>
 
                         <Radio id={`noneTrueA${questionNumber}`} onChange={ () => changeTypeAnswer(index_question, "noneTrueAnswerType") }
-                          name={`typeAnswer${questionNumber}`} value="noneTrueAnswerType" checked={ "score" in question.answers[0] }>Нет</Radio>
+                          name={`typeAnswer${questionNumber}`} value="noneTrueAnswerType" checked={ "score" in question.answers[0] }>Стратегия</Radio>
                       </div>
                     </div>
 
