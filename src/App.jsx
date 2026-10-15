@@ -160,9 +160,9 @@ function App() {
   //   }
   // }, []);
 
-  useEffect(() => {
-    console.log(dataQuestionsAnswers)
-  }, [dataQuestionsAnswers]);
+  // useEffect(() => {
+  //   console.log(dataQuestionsAnswers)
+  // }, [dataQuestionsAnswers]);
 
   // useEffect(() => {
   //   console.log(dataResult)
