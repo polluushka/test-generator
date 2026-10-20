@@ -21,7 +21,8 @@ export function useQuestionsAnswers() {
                     })
                 ),
                 question: [
-                    { text: "", type: "title" }
+                    { text: "", type: "title" },
+                    { text: "", type: "description" }
                 ]
             }
         ]);
@@ -78,8 +79,13 @@ export function useQuestionsAnswers() {
 
                     question: [
                         {
-                            ...questions[indexQuestion].question[0],
+                            ...questions[indexQuestion].question.find(obj => obj.type === "title"),
                             ...(eventTarget.name === `question${indexQuestion + 1}` ? { text: eventTarget.value } : {})
+                        },
+
+                        {
+                            ...questions[indexQuestion].question.find(obj => obj.type === "description"),
+                            ...(eventTarget.name === `question${indexQuestion + 1}_description` ? { text: eventTarget.value } : {})
                         },
 
                         ...(eventTarget.name === `imgQuestion${indexQuestion + 1}`
@@ -87,8 +93,8 @@ export function useQuestionsAnswers() {
                                 url: `https://opis-cdn.tinkoffjournal.ru/mercury/${eventTarget.files[0].name}`,
                                 size: "fullWidth",
                                 type: "image"
-                            }] : ("url" in (questions[indexQuestion].question?.[1] ?? {}) 
-                                ? [questions[indexQuestion].question[1]] : [] )
+                            }] : (questions[indexQuestion].question.some(obj => "url" in obj)
+                                ? [questions[indexQuestion].question.find(obj => "url" in obj)] : [] )
                         )
                     ] 
                 } 
@@ -168,7 +174,12 @@ export function useQuestionsAnswers() {
             const questions = [...prev];
             switch (focusElem.type) {
                 case "questionTitle": 
-                    questions[focusElem.id].question[0] = { ...questions[focusElem.id].question[0], text: formattedText };
+                    questions[focusElem.id].question[questions[focusElem.id].question.findIndex(obj => obj.type === "title")] = 
+                        { text: formattedText, type: "title" };
+                    break;
+                case "questionDescription": 
+                    questions[focusElem.id].question[questions[focusElem.id].question.findIndex(obj => obj.type === "description")] = 
+                        { text: formattedText, type: "description" };
                     break;
                 case "answerTitle": 
                     questions[focusElem.id[0]].answers[focusElem.id[1]] = { ...questions[focusElem.id[0]].answers[focusElem.id[1]], title: formattedText };

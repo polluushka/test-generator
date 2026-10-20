@@ -80,7 +80,10 @@ function App() {
 
     switch (focusElem.type) {
       case "questionTitle":
-        text = dataQuestionsAnswers[focusElem.id].question[0].text;
+        text = dataQuestionsAnswers[focusElem.id].question.find(obj => obj.type === "title").text;
+        break;
+      case "questionDescription":
+        text = dataQuestionsAnswers[focusElem.id].question.find(obj => obj.type === "description").text;
         break;
       case "answerTitle":
         text = dataQuestionsAnswers[focusElem.id[0]].answers[focusElem.id[1]].title;
@@ -100,8 +103,8 @@ function App() {
     const textLink = `<a href="${data.link_input}">` + text.slice(indexSubstr, indexSubstr + selectionValue.length) + "</a>";
     const formattedText = text.slice(0, indexSubstr) + textLink + text.slice(indexSubstr + selectionValue.length);
 
-    if(focusElem.type === "questionTitle" || focusElem.type === "answerTitle"
-      || focusElem.type === "answerDescription") addLinkQuestionsAnswers(focusElem, formattedText)
+    if(focusElem.type === "questionTitle" || focusElem.type === "questionDescription"
+      || focusElem.type === "answerTitle" || focusElem.type === "answerDescription") addLinkQuestionsAnswers(focusElem, formattedText)
     else addLinkResult(focusElem, formattedText);
 
     setIsOpen(prev => prev === false ? true : false);
@@ -122,6 +125,12 @@ function App() {
                     ...("score" in answer && { score: Number(answer.score) }),
                     description: processText(answer.description)
                   }
+              }),
+              question: (step.question.filter(setting => 
+                setting.type === "description" ? (setting.text.length > 0 ? true : false) : true
+              )).map(setting => {
+                return setting.type === "description"
+                  ? processText(setting.text) : setting;
               })
             }
           }),
@@ -250,16 +259,25 @@ function App() {
 
                   <div className="stack">
                     <Input type="text" placeholder="Введите вопрос..." label="Текст вопроса" readOnly={ false }
-                      id={`question${questionNumber}`} name={`question${questionNumber}`} value={question.question[0].text}
+                      id={`question${questionNumber}`} name={`question${questionNumber}`} value={question.question.find(obj => obj.type === "title").text}
                       onInput={ (event) => enterDataQuestionsAnswers(event, index_question, undefined) }
                       onFocus={ () => { setFocusElem({ type: "questionTitle", id: index_question })} } />
+                  </div>
+
+                  <div className="stack">
+                    <Textarea readOnly={false} placeholder="Введите описание вопроса..." heightArea="5"
+                      ariaLabel={`Описание вопроса ${questionNumber}`} id={`question${questionNumber}_description`} 
+                      value={ question.question.find(obj => "text" in obj && obj?.type === "description").text }
+                      onFocus={ () => {setFocusElem({ type: "questionDescription", id: index_question })} }
+                      name={`question${questionNumber}_description`} onInput={(event) => enterDataQuestionsAnswers(event, index_question) } />
                   </div>
 
                   <div className="stack">
                     <span className="field-label">Картинка к вопросу</span>
                     <InputFile label="Картинка к вопросу" id={`imgQuestion${questionNumber}`} name={`imgQuestion${questionNumber}`}
                       onInput={ (event) => enterDataQuestionsAnswers(event, index_question, undefined) } 
-                      nameImage={ question.question[1] ? question.question[1].url.split("/").at(-1) : "Файл не выбран"} />
+                      nameImage={question.question.some(obj => "url" in obj) 
+                        ? question.question.find(obj => "url" in obj).url.split("/").at(-1) : "Файл не выбран"} />
                   </div>
 
                   <div className="type-row">
@@ -377,7 +395,7 @@ function App() {
                     <div className="min-badge">
                       <Input type="number" placeholder="0" ariaLabel="Минимальный балл" readOnly={ false }
                         id={`result${resultNumber}_min`} name={`result${resultNumber}_min`}
-                        onInput={(event) => enterDataResult(event, index_result, "min") } value={result.min} />
+                        onInput={(event) => enterDataResult(event, index_result) } value={result.min} />
                       <small>мин. балл</small>
                     </div>
 
@@ -385,7 +403,7 @@ function App() {
                       <div className="stack">
                         <Input type="text" placeholder="Введите название результата..." label={`Результат ${resultNumber}`}
                           id={`result${resultNumber}`} name={`result${resultNumber}`} value={result.title} readOnly={ false }
-                          onInput={(event) => enterDataResult(event, index_result, "result") }
+                          onInput={(event) => enterDataResult(event, index_result) }
                           onFocus={ () => { setFocusElem({ type: "resultTitle", id: index_result })} } />
                       </div>
 
@@ -393,7 +411,7 @@ function App() {
                         <Textarea readOnly={false} placeholder="Введите описание результата..." heightArea="5"
                           ariaLabel={`Описание результата ${resultNumber}`} id={`result${resultNumber}_description`} value={result.description}
                           onFocus={ () => {setFocusElem({ type: "resultDescription", id: index_result })} }
-                          name={`result${resultNumber}_description`} onInput={(event) => enterDataResult(event, index_result, "resultDescription") } />
+                          name={`result${resultNumber}_description`} onInput={(event) => enterDataResult(event, index_result) } />
                       </div>
 
                       <div className="stack">
