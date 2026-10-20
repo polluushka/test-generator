@@ -1,8 +1,11 @@
-const Modal = ( { children } ) => {
-    
+const Modal = (props) => {
+    const {
+        children,
+        onClick
+    } = props;
 
     return(
-        <div className="modal">
+        <div className="modal" onClick={ onClick }>
             <div className="modal-content">
                 { children }
             </div>

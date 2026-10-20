@@ -26,20 +26,21 @@ function App() {
     enterDataQuestionsAnswers,
     deleteQuestion,
     deleteAnswer,
-    // changeTypeQuestion,
-    changeTypeAnswer
+    changeTypeAnswer,
+    addLinkQuestionsAnswers
   } = useQuestionsAnswers();
 
   const {
     dataResult,
     addResult,
     enterDataResult,
-    deleteResult
+    deleteResult,
+    addLinkResult
   } = useResults();
 
   const [dataConfig, setDataConfig] = useState(templateJSON);
   const [dataConfigEmpty, setDataConfigEmpty] = useState(true);
-  const [modalVisibility, setModalVisibility] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [selectionValue, setSelectionValue] = useState("");
   const [focusElem, setFocusElem] = useState({
     type: "",
@@ -69,28 +70,42 @@ function App() {
     return combinedText;
   }
 
-  // function createLink(event) {
-  //   event.preventDefault();
+  function createLink(event) {
+    event.preventDefault();
 
-  //   const form = new FormData(event.target);
-  //   const data = Object.fromEntries(form);
+    const form = new FormData(event.target);
+    const data = Object.fromEntries(form);
 
-  //   if(focusElem.type === "answer") {
+    let text;
 
-  //     const descriptionAnswer = dataQuestionsAnswers[focusElem.id[0]].answers[focusElem.id[1]].description;
-  //     const indexSubstrDescription = descriptionAnswer.indexOf(selectionValue);
-  //     const substrDescription = descriptionAnswer.slice(indexSubstrDescription, indexSubstrDescription + selectionValue.length);
-  //     const descriptionLink = `<a href="${data.link_input}">` + substrDescription + "</a>";
-  //     setDataQuestionsAnswers(prev => {
-  //       const questions = [...prev];
-  //       questions[focusElem.id[0]].answers[focusElem.id[1]] = {
-  //         ...prev,
-  //         description: descriptionLink
-  //       }
-  //       return questions;
-  //     })
-  //   }
-  // }
+    switch (focusElem.type) {
+      case "questionTitle":
+        text = dataQuestionsAnswers[focusElem.id].question[0].text;
+        break;
+      case "answerTitle":
+        text = dataQuestionsAnswers[focusElem.id[0]].answers[focusElem.id[1]].title;
+        break;
+      case "answerDescription":
+        text = dataQuestionsAnswers[focusElem.id[0]].answers[focusElem.id[1]].description;
+        break;
+      case "resultTitle":
+        text = dataResult.items[focusElem.id].title;
+        break;
+      case "resultDescription":
+        text = dataResult.items[focusElem.id].description;
+        break;
+    }
+
+    const indexSubstr = text.indexOf(selectionValue);
+    const textLink = `<a href="${data.link_input}">` + text.slice(indexSubstr, indexSubstr + selectionValue.length) + "</a>";
+    const formattedText = text.slice(0, indexSubstr) + textLink + text.slice(indexSubstr + selectionValue.length);
+
+    if(focusElem.type === "questionTitle" || focusElem.type === "answerTitle"
+      || focusElem.type === "answerDescription") addLinkQuestionsAnswers(focusElem, formattedText)
+    else addLinkResult(focusElem, formattedText);
+
+    setIsOpen(prev => prev === false ? true : false);
+  }
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -102,11 +117,11 @@ function App() {
             return {
               ...step,
               answers: step.answers.map(answer => {
-                return "score" in answer 
-                  ? {
+                return {
                     ...answer,
-                    score: Number(answer.score)
-                  } : answer
+                    ...("score" in answer && { score: Number(answer.score) }),
+                    description: processText(answer.description)
+                  }
               })
             }
           }),
@@ -145,36 +160,38 @@ function App() {
     return colQuestion + " вопросов";
   }
 
-  // useEffect(() => {
-  //   const toogleModal = (event) => {
-  //     if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === "k") {
-  //       setModalVisibility(prev => prev === false ? true : false);
-  //       setSelectionValue(window.getSelection().toString());
-  //     }
-  //   }
+  useEffect(() => {
+    const toogleModal = (event) => {
+      if (event.altKey && event.code === "KeyL") {
+        const selection = event.target.value.slice(event.target.selectionStart, event.target.selectionEnd);
+        if (selection.length > 0) {
+          setSelectionValue(selection);
+          setIsOpen(prev => prev === false ? true : false);
+        }
+      }
+    }
 
-  //   window.addEventListener("keydown", toogleModal);
+    window.addEventListener("keydown", toogleModal);
 
-  //   return() => {
-  //     window.removeEventListener("keydown", toogleModal);
-  //   }
-  // }, []);
+    return() => {
+      window.removeEventListener("keydown", toogleModal);
+    }
+  }, []);
 
-  // useEffect(() => {
-  //   console.log(dataQuestionsAnswers)
-  // }, [dataQuestionsAnswers]);
-
-  // useEffect(() => {
-  //   console.log(dataResult)
-  // }, [dataResult]);
-  
+  useEffect(() => {
+    if (isOpen === true) {
+      document.getElementById("link_input").focus();
+      document.body.style.overflow = "hidden";
+    } else document.body.style.overflow = "unset";
+  }, [isOpen]);  
 
   return (
     <div className="app">
       {
-        modalVisibility === true 
-        ? <Modal>
-            <Panel>
+        isOpen === true &&
+        ( <Modal onClick={ () => setIsOpen(false) }>
+            <Panel onClick={(e) => e.stopPropagation()}>
+
               <h2>Создание ссылки</h2>
 
               <form id="create-link-form" onSubmit={ (event) => createLink(event) }>
@@ -191,7 +208,7 @@ function App() {
                 <PrimaryButton>Создать</PrimaryButton>
               </form>
             </Panel>
-          </Modal> : ""
+          </Modal> )
       }
       
       <header className="topbar">
@@ -234,7 +251,8 @@ function App() {
                   <div className="stack">
                     <Input type="text" placeholder="Введите вопрос..." label="Текст вопроса" readOnly={ false }
                       id={`question${questionNumber}`} name={`question${questionNumber}`} value={question.question[0].text}
-                      onInput={ (event) => enterDataQuestionsAnswers(event, index_question, undefined) } />
+                      onInput={ (event) => enterDataQuestionsAnswers(event, index_question, undefined) }
+                      onFocus={ () => { setFocusElem({ type: "questionTitle", id: index_question })} } />
                   </div>
 
                   <div className="stack">
@@ -244,16 +262,14 @@ function App() {
                       nameImage={ question.question[1] ? question.question[1].url.split("/").at(-1) : "Файл не выбран"} />
                   </div>
 
-                  <div className="answers">
-                    <div className="type-row">
-                      <span className="field-label" style={{ margin: 0 }}>Вид вопроса</span>
-                      <div className="seg">
-                        <Radio id={`optionButton_q${questionNumber}`} onChange={ (event) => enterDataQuestionsAnswers(event, index_question) }
-                          name={`typeQuestion${questionNumber}`} value="optionButton" checked={ question.type === "optionButton" }>Плашки</Radio>
+                  <div className="type-row">
+                    <span className="field-label" style={{ margin: 0 }}>Вид вопроса</span>
+                    <div className="seg">
+                      <Radio id={`optionButton_q${questionNumber}`} onChange={ (event) => enterDataQuestionsAnswers(event, index_question) }
+                        name={`typeQuestion${questionNumber}`} value="optionButton" checked={ question.type === "optionButton" }>Плашки</Radio>
 
-                        <Radio id={`tile_q${questionNumber}`} onChange={ (event) => enterDataQuestionsAnswers(event, index_question) }
-                          name={`typeQuestion${questionNumber}`} value="tile" checked={ question.type === "tile" }>Тайлы</Radio>
-                      </div>
+                      <Radio id={`tile_q${questionNumber}`} onChange={ (event) => enterDataQuestionsAnswers(event, index_question) }
+                        name={`typeQuestion${questionNumber}`} value="tile" checked={ question.type === "tile" }>Тайлы</Radio>
                     </div>
                   </div>
 
@@ -274,7 +290,8 @@ function App() {
                                 <Input placeholder="Введите вариант ответа..." type="text" label={`Ответ ${answerNumber}`} value={answer.title}
                                   readOnly={ false } id={`q${questionNumber}_a${answerNumber}`} 
                                   name={`q${questionNumber}_a${answerNumber}`} 
-                                  onInput={ (event) => enterDataQuestionsAnswers(event, index_question, index_answer) }/>
+                                  onInput={ (event) => enterDataQuestionsAnswers(event, index_question, index_answer) }
+                                  onFocus={ () => { setFocusElem({ type: "answerTitle", id: [index_question, index_answer] })} } />
                               </div>
                             : <div className="stack">
                                 <InputFile label="Тайл" id={`img_q${questionNumber}_a${answerNumber}`} name={`img_q${questionNumber}_a${answerNumber}`}
@@ -288,11 +305,7 @@ function App() {
                             <Textarea readOnly={false} placeholder="Введите описание ответа..." heightArea="5"
                               ariaLabel={`Описание варианта ответа ${answerNumber}`} value={answer.description}
                               id={`q${questionNumber}_a${answerNumber}_description`} name={`q${questionNumber}_a${answerNumber}_description`}
-                              onFocus={ () => { 
-                                setFocusElem({
-                                  type: "answer",
-                                  id: [index_question, index_answer]
-                                })} 
+                              onFocus={ () => { setFocusElem({ type: "answerDescription", id: [index_question, index_answer] })} 
                               }
                               onInput={ (event) => enterDataQuestionsAnswers(event, index_question, index_answer) } />
                           </div>
@@ -312,8 +325,8 @@ function App() {
                           <div className="a-foot">
                             
                             {
-                              "isCorrect" in answer
-                              ? <div className="seg truth">
+                              "isCorrect" in answer &&
+                              ( <div className="seg truth">
                                   <Radio value="true" id={`true_q${questionNumber}_a${answerNumber}`}
                                     name={`isCorrect_q${questionNumber}_a${answerNumber}`} checked={ answer.isCorrect === true }
                                     onChange={ (event) => enterDataQuestionsAnswers(event, index_question, index_answer) }>Верно</Radio>
@@ -321,12 +334,11 @@ function App() {
                                   <Radio value="false" id={`false_q${questionNumber}_a${answerNumber}`}
                                     name={`isCorrect_q${questionNumber}_a${answerNumber}`} checked={ answer.isCorrect === false } 
                                     onChange={ (event) => enterDataQuestionsAnswers(event, index_question, index_answer) }>Неверно</Radio>
-                                </div>
-                              : ""
+                                </div> )
                             }
 
-                            { question.answers.length > 1 && (
-                              <DeleteButton type="button" className="del" onClick={() => deleteAnswer(index_question, index_answer) }>Удалить</DeleteButton>)
+                            { question.answers.length > 1 && 
+                              (<DeleteButton type="button" className="del" onClick={() => deleteAnswer(index_question, index_answer) }>Удалить</DeleteButton>)
                             }
                           </div>
                         </div>
@@ -373,18 +385,14 @@ function App() {
                       <div className="stack">
                         <Input type="text" placeholder="Введите название результата..." label={`Результат ${resultNumber}`}
                           id={`result${resultNumber}`} name={`result${resultNumber}`} value={result.title} readOnly={ false }
-                          onInput={(event) => enterDataResult(event, index_result, "result") } />
+                          onInput={(event) => enterDataResult(event, index_result, "result") }
+                          onFocus={ () => { setFocusElem({ type: "resultTitle", id: index_result })} } />
                       </div>
 
                       <div className="stack">
                         <Textarea readOnly={false} placeholder="Введите описание результата..." heightArea="5"
                           ariaLabel={`Описание результата ${resultNumber}`} id={`result${resultNumber}_description`} value={result.description}
-                          onFocus={ () => { 
-                            setFocusElem({
-                              type: "result",
-                              id: index_result
-                            })} 
-                          }
+                          onFocus={ () => {setFocusElem({ type: "resultDescription", id: index_result })} }
                           name={`result${resultNumber}_description`} onInput={(event) => enterDataResult(event, index_result, "resultDescription") } />
                       </div>
 

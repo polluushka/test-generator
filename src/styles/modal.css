@@ -13,6 +13,6 @@
     margin: 15rem auto;
 }
 
-/* .no-active {
-    display: none;
-} */
+body.modal {
+    overflow: hidden;
+}

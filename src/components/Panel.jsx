@@ -1,11 +1,11 @@
 const Panel = (props) => {
     const { 
         children,
-        classname
+        onClick
      } = props;
 
     return(
-        <div className="panel">
+        <div className="panel" onClick={ onClick }>
             { children }
         </div>
     )

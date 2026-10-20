@@ -163,6 +163,25 @@ export function useQuestionsAnswers() {
         })
     }
 
+    function addLinkQuestionsAnswers(focusElem, formattedText) {
+        setDataQuestionsAnswers(prev => {
+            const questions = [...prev];
+            switch (focusElem.type) {
+                case "questionTitle": 
+                    questions[focusElem.id].question[0] = { ...questions[focusElem.id].question[0], text: formattedText };
+                    break;
+                case "answerTitle": 
+                    questions[focusElem.id[0]].answers[focusElem.id[1]] = { ...questions[focusElem.id[0]].answers[focusElem.id[1]], title: formattedText };
+                    break;
+                case "answerDescription": 
+                    questions[focusElem.id[0]].answers[focusElem.id[1]] = { ...questions[focusElem.id[0]].answers[focusElem.id[1]], description: formattedText };
+                    break;
+            }
+                
+            return questions;
+        })
+    }
+
     return {
         dataQuestionsAnswers,
         addQuestion,
@@ -170,6 +189,7 @@ export function useQuestionsAnswers() {
         enterDataQuestionsAnswers,
         deleteQuestion,
         deleteAnswer,
-        changeTypeAnswer
+        changeTypeAnswer,
+        addLinkQuestionsAnswers
     }
 }

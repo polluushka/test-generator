@@ -49,10 +49,26 @@ export function useResults() {
         });
     }
 
+    function addLinkResult(focusElem, formattedText) {
+        setDataResult(prev => {
+            
+            switch (focusElem.type) {
+                case "resultTitle": 
+                    prev.items[focusElem.id] = { ...prev.items[focusElem.id], title: formattedText }
+                    break;
+                case "resultDescription": 
+                    prev.items[focusElem.id] = { ...prev.items[focusElem.id], description: formattedText }
+                    break;
+            }
+            return prev;
+        })
+    }
+
     return {
         dataResult,
         addResult,
         enterDataResult,
         deleteResult,
+        addLinkResult
     }
 }

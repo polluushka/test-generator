@@ -740,48 +740,35 @@ a:hover {
     font-size: 14px;
   }
 
-
   .topbar {
     gap: 10px;
-
-    padding-top:
-      calc(11px + env(safe-area-inset-top, 0px));
-
+    padding-top: calc(11px + env(safe-area-inset-top, 0px));
     padding-bottom: 11px;
   }
-
 
   .brand {
     gap: 9px;
   }
 
-
   .brand .mark {
     width: 28px;
     height: 28px;
-
     border-radius: 8px;
-
     font-size: 15px;
   }
-
 
   .brand small {
     font-size: 11px;
   }
 
-
   .ghost-tag {
     padding: 5px 9px;
-
     font-size: 11px;
   }
-
 
   .wrap {
     padding: 12px;
   }
-
 
   .panel {
     padding: 16px;
@@ -789,13 +776,11 @@ a:hover {
     border-radius: 14px;
   }
 
-
   .q-head {
     gap: 9px;
 
     margin-bottom: 16px;
   }
-
 
   .q-index {
     width: 28px;
@@ -806,21 +791,17 @@ a:hover {
     font-size: 14px;
   }
 
-
   .q-head h2 {
     font-size: 16px;
   }
-
 
   .answers {
     grid-template-columns: 1fr;
   }
 
-
   .result-grid {
     grid-template-columns: 1fr;
   }
-
 
   .min-badge {
     min-height: 74px;
@@ -834,18 +815,15 @@ a:hover {
     padding: 12px 14px;
   }
 
-
   .min-badge .input {
     width: 70px;
 
     text-align: left;
   }
 
-
   .side {
     gap: 12px;
   }
-
 
   .seg {
     width: 100%;
@@ -853,26 +831,21 @@ a:hover {
     overflow-x: auto;
   }
 
-
   .seg > * {
     flex: 1;
   }
-
 
   .seg button {
     width: 100%;
   }
 
-
   .answer {
     padding: 13px;
   }
 
-
   .answer .a-foot {
     align-items: flex-start;
   }
-
 
   .truth {
     max-width: calc(100% - 65px);
@@ -890,68 +863,55 @@ a:hover {
     padding-right: 12px;
   }
 
-
   .brand > span:last-child {
     font-size: 14px;
   }
-
 
   .brand small {
     display: none;
   }
 
-
   .ghost-tag {
     font-size: 10.5px;
   }
-
 
   .wrap {
     padding: 8px;
   }
 
-
   .panel {
     padding: 14px;
   }
-
 
   .q-head {
     flex-wrap: wrap;
   }
 
-
   .q-head .del {
     margin-left: auto;
   }
-
 
   .type-row {
     margin-top: 16px;
     margin-bottom: 16px;
   }
 
-
   .answer .a-foot {
     flex-wrap: wrap;
   }
-
 
   .truth {
     width: 100%;
     max-width: none;
   }
 
-
   .truth > * {
     flex: 1;
   }
 
-
   .truth button {
     flex: 1;
   }
-
 
   .answer .del {
     margin-left: auto;
