@@ -1,5 +1,9 @@
 /* DEFAULT BUTTON */
 
+button {
+  cursor: pointer;
+}
+
 .btn {
   min-height: 42px;
 
@@ -178,4 +182,23 @@
 
   box-shadow:
     0 0 0 3px rgba(255, 221, 45, 0.2);
+}
+
+/* EMPTY BUTTON */
+
+.empty-btn {
+  background: none;
+  border: none;
+  margin: auto 0;
+  color: var(--text-dim);
+  transition: 0.15s ease;
+}
+
+.empty-btn:hover {
+  color: var(--text);
+}
+
+.empty-btn:active {
+  color: var(--text);
+  transform: scale(0.9);
 }

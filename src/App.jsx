@@ -17,6 +17,8 @@ import templateJSON from './data/template.json'
 import { useQuestionsAnswers } from './hooks/useQuestionsAnswers';
 import { useResults } from './hooks/useResults';
 
+import { processText, checkTextList, formatEnding } from './utils/typography';
+
 function App() {
 
   const {
@@ -46,29 +48,6 @@ function App() {
     type: "",
     id: ""
   });
-
-  function processText(text) {
-    const regExpList = /^\d*\.\s*/;
-    let availabilityList = false;
-    
-    const arrayStr = text.split(/\s*(?:\r?\n)+\s*/).map(str => {
-      if (regExpList.test(str)) {
-        availabilityList = true;
-        return "\n" + str.replace(regExpList, "") + "</li>"
-      };
-      return  "<p>" + str + "</p>"
-    })
-
-    const combinedText = arrayStr.join("");
-
-    if (availabilityList) {
-      const formattedStrList = ("<ol type='milchin'>" + 
-        combinedText.substring(combinedText.indexOf("\n"), combinedText.lastIndexOf("</li>") + 5) + "</ol>").replaceAll("</li>", "");
-      return combinedText.substring(0, combinedText.indexOf("\n")) + formattedStrList + combinedText.substring(combinedText.lastIndexOf("</li>") + 5);
-    }
-
-    return combinedText;
-  }
 
   function createLink(event) {
     event.preventDefault();
@@ -122,15 +101,17 @@ function App() {
               answers: step.answers.map(answer => {
                 return {
                     ...answer,
+                    title: processText(answer.title),
                     ...("score" in answer && { score: Number(answer.score) }),
-                    description: processText(answer.description)
+                    description: processText(checkTextList(answer.description))
                   }
               }),
               question: (step.question.filter(setting => 
                 setting.type === "description" ? (setting.text.length > 0 ? true : false) : true
               )).map(setting => {
-                return setting.type === "description"
-                  ? processText(setting.text) : setting;
+                return setting.type === "description" 
+                  ? { ...setting, text: processText(checkTextList(setting.text)) } 
+                  : (setting.type === "title" ? { ...setting, text: processText(setting.text) } : setting);
               })
             }
           }),
@@ -139,7 +120,8 @@ function App() {
               return {
                 ...item, 
                 min: Number(item.min),
-                description: processText(item.description)
+                title: processText(item.title),
+                description: processText(checkTextList(item.description))
               }
             }),
             isRetakeEnabled: dataResult.isRetakeEnabled,
@@ -148,7 +130,7 @@ function App() {
           }
         }
         return config
-      });
+    });
 
     setDataConfigEmpty(false);
   }
@@ -157,16 +139,6 @@ function App() {
     navigator.clipboard.writeText(
       dataConfigEmpty ? "" : JSON.stringify(dataConfig, null, 2)
     );
-  }
-
-  function formatEnding(colQuestion) {
-    const n = colQuestion % 10;
-
-    if (colQuestion % 100 >= 11 && colQuestion % 100 <= 19) return colQuestion + " вопросов";
-    if (n === 1) return colQuestion + " вопрос";
-    if (n >= 2 && n <= 4) return colQuestion + " вопроса";
-
-    return colQuestion + " вопросов";
   }
 
   useEffect(() => {
@@ -194,6 +166,10 @@ function App() {
     } else document.body.style.overflow = "unset";
   }, [isOpen]);  
 
+  useEffect(() => {
+    
+  }, [dataConfig]);  
+
   return (
     <div className="app">
       {
@@ -201,7 +177,14 @@ function App() {
         ( <Modal onClick={ () => setIsOpen(false) }>
             <Panel onClick={(e) => e.stopPropagation()}>
 
-              <h2>Создание ссылки</h2>
+              <div className="modal-head">
+                <h2>Создание ссылки</h2>
+                <button className="empty-btn" onClick={ () => setIsOpen(false) }>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="24" height="24" fill="currentColor">
+                  {/* !Font Awesome Free v7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc. */}
+                    <path d="M183.1 137.4C170.6 124.9 150.3 124.9 137.8 137.4C125.3 149.9 125.3 170.2 137.8 182.7L275.2 320L137.9 457.4C125.4 469.9 125.4 490.2 137.9 502.7C150.4 515.2 170.7 515.2 183.2 502.7L320.5 365.3L457.9 502.6C470.4 515.1 490.7 515.1 503.2 502.6C515.7 490.1 515.7 469.8 503.2 457.3L365.8 320L503.1 182.6C515.6 170.1 515.6 149.8 503.1 137.3C490.6 124.8 470.3 124.8 457.8 137.3L320.5 274.7L183.1 137.4z"/></svg>
+                </button>
+              </div>
 
               <form id="create-link-form" onSubmit={ (event) => createLink(event) }>
                 <div className="stack">
@@ -258,8 +241,9 @@ function App() {
                   </div>
 
                   <div className="stack">
-                    <Input type="text" placeholder="Введите вопрос..." label="Текст вопроса" readOnly={ false }
-                      id={`question${questionNumber}`} name={`question${questionNumber}`} value={question.question.find(obj => obj.type === "title").text}
+                    <Input type="text" placeholder="Введите вопрос..." ariaLabel={ `Текст вопроса ${questionNumber}` } readOnly={ false }
+                      id={`question${questionNumber}`} name={`question${questionNumber}`} 
+                      value={question.question.find(obj => obj.type === "title").text}
                       onInput={ (event) => enterDataQuestionsAnswers(event, index_question, undefined) }
                       onFocus={ () => { setFocusElem({ type: "questionTitle", id: index_question })} } />
                   </div>
@@ -274,7 +258,8 @@ function App() {
 
                   <div className="stack">
                     <span className="field-label">Картинка к вопросу</span>
-                    <InputFile label="Картинка к вопросу" id={`imgQuestion${questionNumber}`} name={`imgQuestion${questionNumber}`}
+                    <InputFile label="Картинка к вопросу" id={`imgQuestion${questionNumber}`} 
+                      name={`imgQuestion${questionNumber}`} ariaLabel={`Картинка к вопросу ${questionNumber}`}
                       onInput={ (event) => enterDataQuestionsAnswers(event, index_question, undefined) } 
                       nameImage={question.question.some(obj => "url" in obj) 
                         ? question.question.find(obj => "url" in obj).url.split("/").at(-1) : "Файл не выбран"} />
@@ -306,13 +291,13 @@ function App() {
                             question.type === "optionButton"
                             ? <div className="stack">
                                 <Input placeholder="Введите вариант ответа..." type="text" label={`Ответ ${answerNumber}`} value={answer.title}
-                                  readOnly={ false } id={`q${questionNumber}_a${answerNumber}`} 
-                                  name={`q${questionNumber}_a${answerNumber}`} 
+                                  readOnly={ false } id={`q${questionNumber}_a${answerNumber}`} name={`q${questionNumber}_a${answerNumber}`} 
                                   onInput={ (event) => enterDataQuestionsAnswers(event, index_question, index_answer) }
                                   onFocus={ () => { setFocusElem({ type: "answerTitle", id: [index_question, index_answer] })} } />
                               </div>
                             : <div className="stack">
-                                <InputFile label="Тайл" id={`img_q${questionNumber}_a${answerNumber}`} name={`img_q${questionNumber}_a${answerNumber}`}
+                                <InputFile id={`img_q${questionNumber}_a${answerNumber}`}
+                                  name={`img_q${questionNumber}_a${answerNumber}`} ariaLabel={`Тайл ${answerNumber}`}
                                   onInput={ (event) => enterDataQuestionsAnswers(event, index_question, index_answer) } 
                                   nameImage={ "backgroundUrl" in answer && answer.backgroundUrl.length > 0 
                                     ? answer.backgroundUrl.split("/").at(-1) : "Файл не выбран" } />
@@ -393,7 +378,7 @@ function App() {
 
                   <div className="result-grid">
                     <div className="min-badge">
-                      <Input type="number" placeholder="0" ariaLabel="Минимальный балл" readOnly={ false }
+                      <Input type="number" placeholder="0" ariaLabel={`Минимальный балл ${resultNumber}`} readOnly={ false }
                         id={`result${resultNumber}_min`} name={`result${resultNumber}_min`}
                         onInput={(event) => enterDataResult(event, index_result) } value={result.min} />
                       <small>мин. балл</small>
@@ -401,7 +386,7 @@ function App() {
 
                     <div className="res-fields">
                       <div className="stack">
-                        <Input type="text" placeholder="Введите название результата..." label={`Результат ${resultNumber}`}
+                        <Input type="text" placeholder="Введите название результата..." ariaLabel={`Результат ${resultNumber}`}
                           id={`result${resultNumber}`} name={`result${resultNumber}`} value={result.title} readOnly={ false }
                           onInput={(event) => enterDataResult(event, index_result) }
                           onFocus={ () => { setFocusElem({ type: "resultTitle", id: index_result })} } />
@@ -416,6 +401,7 @@ function App() {
 
                       <div className="stack">
                         <InputFile label="Картинка к результату" id={`imgResult${resultNumber}`} name={`imgResult${resultNumber}`}
+                          ariaLabel={`Картинка к результату ${resultNumber}`}
                           onInput={ (event) => enterDataResult(event, index_result) } 
                           nameImage={ "imageUrl" in result && result.imageUrl.length > 0 
                             ? result.imageUrl.split("/").at(-1) : "Файл не выбран" }
@@ -474,6 +460,12 @@ function App() {
             <Textarea placeholder="Здесь будет сгенерированный конфиг" ariaLabel="Конфиг" id="config"
               name="config" readOnly={true} value={ dataConfigEmpty ? "" : JSON.stringify(dataConfig, null, 2) } />
 
+          </Panel>
+          <Panel>
+              <p style={{ margin: 0 }}>
+                <span style={{ color: "var(--text-dim)" }}>разработка:</span> Полина Катикова</p>
+              <p style={{ margin: 0 }}>
+                <span style={{ color: "var(--text-dim)" }}>telegram:</span> <a href="https://t.me/polluushka">@polluushka</a></p>
           </Panel>
         </aside>
       </div>

@@ -7,7 +7,8 @@ const InputFile = (props) => {
         id,
         name,
         onInput,
-        nameImage
+        nameImage,
+        ariaLabel
     } = props;
 
     const [titleImg, setTitleImg] = useState("Файл не выбран");
@@ -34,7 +35,7 @@ const InputFile = (props) => {
                     <em>Файл нужно залить в mercury с этим же именем</em>
                 </span>
                 <input type="file" id={ id } name={ name } onChange={ () => getTitleImg(nameImage) } hidden
-                    onInput={ onInput } />
+                    onInput={ onInput } aria-label={ ariaLabel } />
             </Label>
         </>
         
