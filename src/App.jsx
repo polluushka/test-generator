@@ -29,7 +29,8 @@ function App() {
     deleteQuestion,
     deleteAnswer,
     changeTypeAnswer,
-    addLinkQuestionsAnswers
+    addLinkQuestionsAnswers,
+    imageDescriptions
   } = useQuestionsAnswers();
 
   const {
@@ -96,16 +97,19 @@ function App() {
     setDataConfig(prev => {
         const config = {
           ...prev, 
-          steps: dataQuestionsAnswers.map(step => {
+          steps: dataQuestionsAnswers.map((step, stepIndex) => {
             return {
               ...step,
-              answers: step.answers.map(answer => {
+              answers: step.answers.map((answer, answerIndex) => {
                 return {
                     ...answer,
                     title: processText(answer.title),
                     ...("score" in answer && { score: Number(answer.score) }),
                     ...("groupNumber" in answer && { groupNumber: Number(answer.groupNumber) }),
-                    description: processText(checkTextList(answer.description))
+                    ...(imageDescriptions.some(obj => obj.question === stepIndex && obj.answer === answerIndex)
+                          ? { description: processText(checkTextList(answer.description)) 
+                            + `<img src='${imageDescriptions.find(obj => obj.question === stepIndex && obj.answer === answerIndex).url}' style='max-width: 100%;'>` } 
+                          : { description: processText(checkTextList(answer.description)) })
                   }
               }),
               question: (step.question.filter(setting => 
@@ -233,7 +237,7 @@ function App() {
                     <h2>Вопрос</h2>
                     {
                       dataQuestionsAnswers.length > 1
-                        ? <DeleteButton type="button" onClick={() => deleteQuestion(index_question)}>Удалить</DeleteButton> : ""
+                        && (<DeleteButton type="button" onClick={() => deleteQuestion(index_question)}>Удалить</DeleteButton>)
                     }
                     
                   </div>
@@ -312,27 +316,39 @@ function App() {
                           </div>
 
                           {
-                            "score" in answer
-                            ? <div className="stack">
+                            question.type !== "tile" &&
+                              (<div className="stack">
+                                  <InputFile id={`img_q${questionNumber}_a${answerNumber}_description`}
+                                    name={`img_q${questionNumber}_a${answerNumber}_description`} ariaLabel={`Картинка-пояснение ${answerNumber}`}
+                                    onInput={ (event) => enterDataQuestionsAnswers(event, index_question, index_answer) } 
+                                    nameImage={ imageDescriptions.some(obj => obj.question === index_question && obj.answer === index_answer) 
+                                      ? imageDescriptions.find(obj => obj.question === index_question && obj.answer === index_answer).url.split("/").at(-1) 
+                                      : "Файл не выбран" } />
+                              </div>)
+                          }
+
+                          {
+                            "score" in answer && 
+                              (<div className="stack">
                                 <div className="min-badge">
                                   <Input type="number" placeholder="0" ariaLabel="Балл" readOnly={ false }
                                     id={`score_q${questionNumber}_a${answerNumber}`} name={`score_q${questionNumber}_a${answerNumber}`}
                                     onInput={ (event) => enterDataQuestionsAnswers(event, index_question, index_answer) } value={answer.score} />
                                     <small>балл</small>
                                   </div>
-                              </div> : ""
+                              </div>)
                           }
 
                           {
-                            "groupNumber" in answer
-                            ? <div className="stack">
+                            "groupNumber" in answer &&
+                              (<div className="stack">
                                 <div className="min-badge">
                                   <Input type="number" placeholder="1" ariaLabel="Категория" readOnly={ false }
                                     id={`groupNumber_q${questionNumber}_a${answerNumber}`} name={`groupNumber_q${questionNumber}_a${answerNumber}`}
                                     onInput={ (event) => enterDataQuestionsAnswers(event, index_question, index_answer) } value={answer.groupNumber} />
                                     <small>категория</small>
                                   </div>
-                              </div> : ""
+                              </div>)
                           }
 
                           <div className="a-foot">
@@ -381,8 +397,8 @@ function App() {
                     <span className="q-index">{resultNumber}</span>
                     <h2>Результат</h2>
                     {
-                      dataResult.items.length > 1
-                        ? <DeleteButton type="button" className="del" onClick={() => deleteResult(index_result)}>Удалить</DeleteButton> : ""
+                      dataResult.items.length > 1 && 
+                        (<DeleteButton type="button" className="del" onClick={() => deleteResult(index_result)}>Удалить</DeleteButton>)
                     }
                   </div>
 

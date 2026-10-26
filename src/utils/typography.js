@@ -22,6 +22,8 @@ export function processText(text) {
 }
 
 export function checkTextList(text) {
+    if (text.length === 0) return "";
+
     const regExpListItem = /^\d*\.\s*/;
 
     let availabilityList = false;

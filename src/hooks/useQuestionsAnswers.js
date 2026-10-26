@@ -4,6 +4,7 @@ import stepTemplate from '../data/step-template.json'
 
 export function useQuestionsAnswers() {
     const [dataQuestionsAnswers, setDataQuestionsAnswers] = useState([stepTemplate]);
+    const [imageDescriptions, setImageDescriptions] = useState([]);
 
     function addQuestion() {
         setDataQuestionsAnswers(prev => [
@@ -113,7 +114,7 @@ export function useQuestionsAnswers() {
                             ...(eventTarget.name === `q${indexQuestion + 1}_a${indexAnswer + 1}_description`
                                 ? { description: eventTarget.value } : {}),
                                 
-                            ...(eventTarget.name === `img_q${indexQuestion + 1}_a${indexAnswer + 1}`
+                            ...(eventTarget.name === `${indexQuestion + 1}_a${indexAnswer + 1}`
                                 ? { backgroundUrl: `https://opis-cdn.tinkoffjournal.ru/mercury/${eventTarget.files[0].name}` } : {}),
 
                             ...(eventTarget.name === `score_q${indexQuestion + 1}_a${indexAnswer + 1}`
@@ -129,6 +130,32 @@ export function useQuestionsAnswers() {
                                 ? ((eventTarget.name === `isCorrect_q${indexQuestion + 1}_a${indexAnswer + 1}` && eventTarget.value === "true") 
                                     ? { reactionImageUrl: "https://opis-cdn.tinkoffjournal.ru/mercury/D2t-lz8bxw.Like.png" }
                                     : { reactionImageUrl: "https://opis-cdn.tinkoffjournal.ru/mercury/7iyV9K3XGD.dislike.png" }) : {}) } : answer )
+                }
+
+                if (eventTarget.name === `img_q${indexQuestion + 1}_a${indexAnswer + 1}_description`) {
+                    let imageUpd = false;
+                    setImageDescriptions(prev => {
+                        const images = prev.map(image => {
+                            if(image.question === indexQuestion && image.answer === indexAnswer) {
+                                imageUpd = true;
+                                return { 
+                                    ...image, 
+                                    url: `https://opis-cdn.tinkoffjournal.ru/mercury/${eventTarget.files[0].name}` 
+                                }
+                            } else return image;
+                        })
+                        if (imageUpd === false) {
+                            return [
+                                ...prev,
+                                { 
+                                    question: indexQuestion, 
+                                    answer: indexAnswer, 
+                                    url: `<img src='https://opis-cdn.tinkoffjournal.ru/mercury/${eventTarget.files[0].name}` 
+                                }
+                            ]
+                        }
+                        return images;
+                    });
                 }
             }
             return questions;
@@ -206,6 +233,7 @@ export function useQuestionsAnswers() {
         deleteQuestion,
         deleteAnswer,
         changeTypeAnswer,
-        addLinkQuestionsAnswers
+        addLinkQuestionsAnswers,
+        imageDescriptions
     }
 }
