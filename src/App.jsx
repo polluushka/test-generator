@@ -37,7 +37,8 @@ function App() {
     addResult,
     enterDataResult,
     deleteResult,
-    addLinkResult
+    addLinkResult,
+    changeTypeResult
   } = useResults();
 
   const [dataConfig, setDataConfig] = useState(templateJSON);
@@ -103,6 +104,7 @@ function App() {
                     ...answer,
                     title: processText(answer.title),
                     ...("score" in answer && { score: Number(answer.score) }),
+                    ...("groupNumber" in answer && { groupNumber: Number(answer.groupNumber) }),
                     description: processText(checkTextList(answer.description))
                   }
               }),
@@ -119,7 +121,7 @@ function App() {
             items: dataResult.items.map(item => {
               return {
                 ...item, 
-                min: Number(item.min),
+                ...("min" in item ? { min: Number(item.min) } : { groupNumber: Number(item.groupNumber) }),
                 title: processText(item.title),
                 description: processText(checkTextList(item.description))
               }
@@ -165,10 +167,6 @@ function App() {
       document.body.style.overflow = "hidden";
     } else document.body.style.overflow = "unset";
   }, [isOpen]);  
-
-  useEffect(() => {
-    
-  }, [dataConfig]);  
 
   return (
     <div className="app">
@@ -325,6 +323,18 @@ function App() {
                               </div> : ""
                           }
 
+                          {
+                            "groupNumber" in answer
+                            ? <div className="stack">
+                                <div className="min-badge">
+                                  <Input type="number" placeholder="1" ariaLabel="Категория" readOnly={ false }
+                                    id={`groupNumber_q${questionNumber}_a${answerNumber}`} name={`groupNumber_q${questionNumber}_a${answerNumber}`}
+                                    onInput={ (event) => enterDataQuestionsAnswers(event, index_question, index_answer) } value={answer.groupNumber} />
+                                    <small>категория</small>
+                                  </div>
+                              </div> : ""
+                          }
+
                           <div className="a-foot">
                             
                             {
@@ -377,13 +387,22 @@ function App() {
                   </div>
 
                   <div className="result-grid">
-                    <div className="min-badge">
-                      <Input type="number" placeholder="0" ariaLabel={`Минимальный балл ${resultNumber}`} readOnly={ false }
-                        id={`result${resultNumber}_min`} name={`result${resultNumber}_min`}
-                        onInput={(event) => enterDataResult(event, index_result) } value={result.min} />
-                      <small>мин. балл</small>
-                    </div>
-
+                    {
+                      "groupNumber" in result ?
+                        <div className="min-badge">
+                          <Input type="number" placeholder="1" ariaLabel={`Категория ${resultNumber}`} readOnly={ false }
+                            id={`result${resultNumber}_groupNumber`} name={`result${resultNumber}_groupNumber`}
+                            onInput={(event) => enterDataResult(event, index_result) } value={result.groupNumber} />
+                          <small>категория</small>
+                        </div> 
+                        : <div className="min-badge">
+                            <Input type="number" placeholder="0" ariaLabel={`Минимальный балл ${resultNumber}`} readOnly={ false }
+                              id={`result${resultNumber}_min`} name={`result${resultNumber}_min`}
+                              onInput={(event) => enterDataResult(event, index_result) } value={result.min} />
+                            <small>мин. балл</small>
+                          </div>
+                    }
+                    
                     <div className="res-fields">
                       <div className="stack">
                         <Input type="text" placeholder="Введите название результата..." ariaLabel={`Результат ${resultNumber}`}
@@ -434,11 +453,20 @@ function App() {
             <div className="type-row">
               <span className="field-label" style={{ margin: 0 }}>Тип теста</span>
               <div className="seg">
-                <Radio id="quiz" onChange={ (event) => changeTypeAnswer(event.target.value) }
+                <Radio id="quiz" onChange={ (event) => {
+                  changeTypeAnswer(event.target.value);
+                  changeTypeResult(event.target.value)}}
                   name="typeTest" value="quiz" checked={ "isCorrect" in dataQuestionsAnswers[0].answers[0] }>Квиз</Radio>
 
-                <Radio id="strategy" onChange={ (event) => changeTypeAnswer(event.target.value) }
+                <Radio id="strategy" onChange={ (event) => {
+                  changeTypeAnswer(event.target.value);
+                  changeTypeResult(event.target.value)}}
                   name="typeTest" value="strategy" checked={ "score" in dataQuestionsAnswers[0].answers[0] }>Стратегия</Radio>
+
+                <Radio id="category" onChange={ (event) => {
+                  changeTypeAnswer(event.target.value);
+                  changeTypeResult(event.target.value)}}
+                  name="typeTest" value="category" checked={ "groupNumber" in dataQuestionsAnswers[0].answers[0] }>Категории</Radio>
               </div>
             </div>
 

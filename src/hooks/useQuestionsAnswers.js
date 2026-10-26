@@ -15,7 +15,8 @@ export function useQuestionsAnswers() {
                             ? { title: "" } : "isCorrect" in prev[0].answers[0]
                                 ? { backgroundUrl: "", reactionImageUrl: "" } : { backgroundUrl: "" }),
 
-                        ...("isCorrect" in prev[0].answers[0] ? { isCorrect: false } : { score: 0 }),
+                        ...("isCorrect" in prev[0].answers[0] ? { isCorrect: false } 
+                            : ("score" in prev[0].answers[0] ? { score: 0 } : { groupNumber: 1 })),
 
                         description: ""
                     })
@@ -41,7 +42,8 @@ export function useQuestionsAnswers() {
                             : "isCorrect" in questions[indexQuestion].answers[0]
                                 ? { backgroundUrl: "", reactionImageUrl: "https://opis-cdn.tinkoffjournal.ru/mercury/7iyV9K3XGD.dislike.png" } : { backgroundUrl: "" }
                         ),
-                        ...("isCorrect" in questions[indexQuestion].answers[0] ? { isCorrect: false } : { score: 0 } ),
+                        ...("isCorrect" in questions[indexQuestion].answers[0] ? { isCorrect: false } 
+                            : ("score" in questions[indexQuestion].answers[0] ? { score: 0 } : { groupNumber: 1 }) ),
                         description: ""
                     }
                 ]
@@ -117,6 +119,9 @@ export function useQuestionsAnswers() {
                             ...(eventTarget.name === `score_q${indexQuestion + 1}_a${indexAnswer + 1}`
                                 ? { score: eventTarget.value } : {}),
 
+                            ...(eventTarget.name === `groupNumber_q${indexQuestion + 1}_a${indexAnswer + 1}`
+                                ? { groupNumber: eventTarget.value } : {}),    
+
                             ...(eventTarget.name === `isCorrect_q${indexQuestion + 1}_a${indexAnswer + 1}`
                                 ? { isCorrect: eventTarget.value === "true" } : {}),
 
@@ -150,7 +155,7 @@ export function useQuestionsAnswers() {
                 return {
                     ...step, 
                     answers: step.answers.map(answer => {
-                        const { isCorrect, score, reactionImageUrl, ...rest } = answer;
+                        const { isCorrect, score, groupNumber, reactionImageUrl, ...rest } = answer;
                         if (typeTest === "quiz") {
                             if (step.type === "tile") {
                                 return { 
@@ -161,10 +166,10 @@ export function useQuestionsAnswers() {
                             }
                             return { ...rest, isCorrect: false }
                         }
-                        return { ...rest, score: 0 }
+                        if (typeTest === "strategy") return { ...rest, score: 0 };
+                        return { ...rest, groupNumber: 1 };
                     })
                 }
-                // return step;
             })
         })
     }

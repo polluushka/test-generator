@@ -3,6 +3,7 @@ import { useState } from "react";
 import resultTemplate from '../data/result-template.json'
 
 export function useResults() {
+
     const [dataResult, setDataResult] = useState(resultTemplate);
 
     function addResult() {
@@ -11,7 +12,8 @@ export function useResults() {
                 ...prev,
                 items: [
                     ...prev.items,
-                    { min: 0, title: "", imageUrl: "", description: "" }
+                    { title: "", imageUrl: "", description: "", 
+                        ...( "groupNumber" in prev.items[0] ? { groupNumber: 1 } : { min: 0 } ) }
                 ]
             };
         })
@@ -29,6 +31,7 @@ export function useResults() {
                     ? {
                         ...item,
                         ...(eventTarget.name === `result${indexResult + 1}_min` ? { min: eventTarget.value } : {}),
+                        ...(eventTarget.name === `result${indexResult + 1}_groupNumber` ? { groupNumber: eventTarget.value } : {}),
                         ...(eventTarget.name === `result${indexResult + 1}` ? { title: eventTarget.value } : {}),
                         ...(eventTarget.name === `result${indexResult + 1}_description` ? { description: eventTarget.value } : {}),
                         ...(eventTarget.name === `imgResult${indexResult + 1}` 
@@ -64,11 +67,26 @@ export function useResults() {
         })
     }
 
+    function changeTypeResult(typeTest) {
+        setDataResult(prev => {
+            return {
+                ...prev,
+                items: prev.items.map(item => {
+                    const { min, groupNumber, ...rest } = item;
+                    if (typeTest === "category") return { ...rest, groupNumber: 1 };
+                    if(typeTest !== "category" && "min" in item) return { ...rest, min: min };
+                    return { ...rest, min: 0 };
+                })
+            }
+        })
+    }
+
     return {
         dataResult,
         addResult,
         enterDataResult,
         deleteResult,
-        addLinkResult
+        addLinkResult,
+        changeTypeResult
     }
 }
