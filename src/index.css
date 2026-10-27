@@ -593,14 +593,6 @@ button {
   gap: 16px;
 }
 
-
-/* SIDEBAR META */
-
-.side .meta .stack + .stack {
-  margin-top: 14px;
-}
-
-
 /* HINT */
 
 .hint {

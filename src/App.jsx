@@ -495,15 +495,7 @@ function App() {
 
         <aside className="side">
 
-          <Panel classname="panel meta">
-            
-            <div className="stack">
-              <Input type="text" placeholder="Введите название..." label="Название теста" id="name" name="name" readOnly={ false } />
-            </div>
-
-            <div className="stack">
-              <Input type="text" placeholder="/slug-test" label="Слаг" id="slug" name="slug" readOnly={ false } />
-            </div>
+          <Panel classname="panel">
 
             <div className="type-row">
               <span className="field-label" style={{ margin: 0 }}>Тип теста</span>
@@ -528,10 +520,6 @@ function App() {
             <PrimaryButton type="submit" form="test-generator-form">Сгенерировать конфиг</PrimaryButton>
             <ClearButton onClick={ () => deleteAllData() }>Стереть все</ClearButton>
 
-            {/* <p className="hint">
-              Конфиг собирается вживую по мере заполнения.
-              Проверьте, что у каждого вопроса выбран верный ответ.
-            </p> */}
           </Panel>
 
           <Panel classname="panel">

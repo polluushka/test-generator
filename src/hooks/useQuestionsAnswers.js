@@ -253,6 +253,7 @@ export function useQuestionsAnswers() {
 
     function deleteQuestionsAnswersData() {
         setDataQuestionsAnswers([stepTemplate]);
+        setImageDescriptions([]);
     }
 
     return {
