@@ -90,22 +90,17 @@
 .upload .ico {
   width: 38px;
   height: 38px;
-
   flex: none;
-
   display: grid;
   place-items: center;
-
   border-radius: 10px;
-
   background: var(--field-raised);
 }
 
 .upload .ico svg {
   width: 19px;
   height: 19px;
-
-  stroke: var(--accent);
+  color: var(--accent);
 }
 
 .upload b {

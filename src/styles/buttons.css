@@ -192,6 +192,7 @@ button {
   margin: auto 0;
   color: var(--text-dim);
   transition: 0.15s ease;
+  font-size: 24px;
 }
 
 .empty-btn:hover {

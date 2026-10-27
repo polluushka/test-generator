@@ -255,6 +255,11 @@ button {
   margin-top: 0;
 }
 
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+}
+
 /* QUESTION HEADER */
 
 .q-head {

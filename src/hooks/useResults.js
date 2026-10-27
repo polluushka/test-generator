@@ -81,12 +81,24 @@ export function useResults() {
         })
     }
 
+    function deleteImageResult(indexResult) {
+        setDataResult(prev => {
+            return {
+                ...prev,
+                items: prev.items.map((item, itemIndex) => {
+                    return itemIndex === indexResult ? { ...item, imageUrl: "" } : item;
+                })
+            };
+        })
+    }
+
     return {
         dataResult,
         addResult,
         enterDataResult,
         deleteResult,
         addLinkResult,
-        changeTypeResult
+        changeTypeResult,
+        deleteImageResult
     }
 }

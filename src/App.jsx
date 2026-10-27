@@ -19,6 +19,9 @@ import { useResults } from './hooks/useResults';
 
 import { processText, checkTextList, formatEnding } from './utils/typography';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
+
 function App() {
 
   const {
@@ -30,7 +33,8 @@ function App() {
     deleteAnswer,
     changeTypeAnswer,
     addLinkQuestionsAnswers,
-    imageDescriptions
+    imageDescriptions,
+    deleteImageQuestionAnswer,
   } = useQuestionsAnswers();
 
   const {
@@ -39,7 +43,8 @@ function App() {
     enterDataResult,
     deleteResult,
     addLinkResult,
-    changeTypeResult
+    changeTypeResult,
+    deleteImageResult
   } = useResults();
 
   const [dataConfig, setDataConfig] = useState(templateJSON);
@@ -179,12 +184,10 @@ function App() {
         ( <Modal onClick={ () => setIsOpen(false) }>
             <Panel onClick={(e) => e.stopPropagation()}>
 
-              <div className="modal-head">
+              <div className="flex-between">
                 <h2>Создание ссылки</h2>
                 <button className="empty-btn" onClick={ () => setIsOpen(false) }>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="24" height="24" fill="currentColor">
-                  {/* !Font Awesome Free v7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc. */}
-                    <path d="M183.1 137.4C170.6 124.9 150.3 124.9 137.8 137.4C125.3 149.9 125.3 170.2 137.8 182.7L275.2 320L137.9 457.4C125.4 469.9 125.4 490.2 137.9 502.7C150.4 515.2 170.7 515.2 183.2 502.7L320.5 365.3L457.9 502.6C470.4 515.1 490.7 515.1 503.2 502.6C515.7 490.1 515.7 469.8 503.2 457.3L365.8 320L503.1 182.6C515.6 170.1 515.6 149.8 503.1 137.3C490.6 124.8 470.3 124.8 457.8 137.3L320.5 274.7L183.1 137.4z"/></svg>
+                  <FontAwesomeIcon icon={faXmark} />
                 </button>
               </div>
 
@@ -260,11 +263,17 @@ function App() {
 
                   <div className="stack">
                     <span className="field-label">Картинка к вопросу</span>
-                    <InputFile label="Картинка к вопросу" id={`imgQuestion${questionNumber}`} 
-                      name={`imgQuestion${questionNumber}`} ariaLabel={`Картинка к вопросу ${questionNumber}`}
-                      onInput={ (event) => enterDataQuestionsAnswers(event, index_question, undefined) } 
-                      nameImage={question.question.some(obj => "url" in obj) 
-                        ? question.question.find(obj => "url" in obj).url.split("/").at(-1) : "Файл не выбран"} />
+                    <div className="flex-between">
+                      <InputFile label="Картинка к вопросу" id={`imgQuestion${questionNumber}`} 
+                        name={`imgQuestion${questionNumber}`} ariaLabel={`Картинка к вопросу ${questionNumber}`}
+                        onInput={ (event) => enterDataQuestionsAnswers(event, index_question, undefined) } 
+                        nameImage={question.question.some(obj => "url" in obj) 
+                          ? question.question.find(obj => "url" in obj).url.split("/").at(-1) : "Файл не выбран"} />
+                      {question.question.some(obj => "url" in obj) && 
+                        (<DeleteButton onClick={ () => deleteImageQuestionAnswer(index_question, undefined) }>
+                          <FontAwesomeIcon icon={faXmark} /></DeleteButton>)}
+                    </div>
+                    
                   </div>
 
                   <div className="type-row">
@@ -298,11 +307,16 @@ function App() {
                                   onFocus={ () => { setFocusElem({ type: "answerTitle", id: [index_question, index_answer] })} } />
                               </div>
                             : <div className="stack">
-                                <InputFile id={`img_q${questionNumber}_a${answerNumber}`}
-                                  name={`img_q${questionNumber}_a${answerNumber}`} ariaLabel={`Тайл ${answerNumber}`}
-                                  onInput={ (event) => enterDataQuestionsAnswers(event, index_question, index_answer) } 
-                                  nameImage={ "backgroundUrl" in answer && answer.backgroundUrl.length > 0 
-                                    ? answer.backgroundUrl.split("/").at(-1) : "Файл не выбран" } />
+                                <div className="flex-between">
+                                  <InputFile id={`img_q${questionNumber}_a${answerNumber}`}
+                                    name={`img_q${questionNumber}_a${answerNumber}`} ariaLabel={`Тайл ${answerNumber}`}
+                                    onInput={ (event) => enterDataQuestionsAnswers(event, index_question, index_answer) } 
+                                    nameImage={ "backgroundUrl" in answer && answer.backgroundUrl.length > 0 
+                                      ? answer.backgroundUrl.split("/").at(-1) : "Файл не выбран" } />
+                                  {"backgroundUrl" in answer && answer.backgroundUrl.length > 0 &&
+                                    (<DeleteButton onClick={ () => deleteImageQuestionAnswer(index_question, index_answer) }>
+                                      <FontAwesomeIcon icon={faXmark} /></DeleteButton>)}
+                                </div>
                               </div>
                           }
 
@@ -318,12 +332,18 @@ function App() {
                           {
                             question.type !== "tile" &&
                               (<div className="stack">
-                                  <InputFile id={`img_q${questionNumber}_a${answerNumber}_description`}
-                                    name={`img_q${questionNumber}_a${answerNumber}_description`} ariaLabel={`Картинка-пояснение ${answerNumber}`}
-                                    onInput={ (event) => enterDataQuestionsAnswers(event, index_question, index_answer) } 
-                                    nameImage={ imageDescriptions.some(obj => obj.question === index_question && obj.answer === index_answer) 
-                                      ? imageDescriptions.find(obj => obj.question === index_question && obj.answer === index_answer).url.split("/").at(-1) 
-                                      : "Файл не выбран" } />
+                                  <div className="flex-between">
+                                    <InputFile id={`img_q${questionNumber}_a${answerNumber}_description`}
+                                      name={`img_q${questionNumber}_a${answerNumber}_description`} ariaLabel={`Картинка-пояснение ${answerNumber}`}
+                                      onInput={ (event) => enterDataQuestionsAnswers(event, index_question, index_answer) } 
+                                      nameImage={ imageDescriptions.some(obj => obj.question === index_question && obj.answer === index_answer) 
+                                        ? imageDescriptions.find(obj => obj.question === index_question && obj.answer === index_answer).url.split("/").at(-1) 
+                                        : "Файл не выбран" } />
+                                    {imageDescriptions.some(obj => obj.question === index_question && obj.answer === index_answer) &&
+                                      (<DeleteButton onClick={ () => deleteImageQuestionAnswer(index_question, index_answer) }>
+                                        <FontAwesomeIcon icon={faXmark} /></DeleteButton>)}
+                                  </div>
+                                  
                               </div>)
                           }
 
@@ -435,12 +455,15 @@ function App() {
                       </div>
 
                       <div className="stack">
-                        <InputFile label="Картинка к результату" id={`imgResult${resultNumber}`} name={`imgResult${resultNumber}`}
-                          ariaLabel={`Картинка к результату ${resultNumber}`}
-                          onInput={ (event) => enterDataResult(event, index_result) } 
-                          nameImage={ "imageUrl" in result && result.imageUrl.length > 0 
-                            ? result.imageUrl.split("/").at(-1) : "Файл не выбран" }
-                        />
+                        <div className="flex-between">
+                          <InputFile label="Картинка к результату" id={`imgResult${resultNumber}`} name={`imgResult${resultNumber}`}
+                            ariaLabel={`Картинка к результату ${resultNumber}`} onInput={ (event) => enterDataResult(event, index_result) } 
+                            nameImage={ "imageUrl" in result && result.imageUrl.length > 0 ? result.imageUrl.split("/").at(-1) : "Файл не выбран" } />        
+                          {"imageUrl" in result && result.imageUrl.length > 0 &&
+                            (<DeleteButton onClick={ () => deleteImageResult(index_result) }><FontAwesomeIcon icon={faXmark} /></DeleteButton>)}  
+                        </div>
+                        
+                        
                       </div>
                     </div>
                   </div>

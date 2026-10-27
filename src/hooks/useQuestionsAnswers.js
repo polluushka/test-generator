@@ -114,7 +114,7 @@ export function useQuestionsAnswers() {
                             ...(eventTarget.name === `q${indexQuestion + 1}_a${indexAnswer + 1}_description`
                                 ? { description: eventTarget.value } : {}),
                                 
-                            ...(eventTarget.name === `${indexQuestion + 1}_a${indexAnswer + 1}`
+                            ...(eventTarget.name === `img_q${indexQuestion + 1}_a${indexAnswer + 1}`
                                 ? { backgroundUrl: `https://opis-cdn.tinkoffjournal.ru/mercury/${eventTarget.files[0].name}` } : {}),
 
                             ...(eventTarget.name === `score_q${indexQuestion + 1}_a${indexAnswer + 1}`
@@ -150,7 +150,7 @@ export function useQuestionsAnswers() {
                                 { 
                                     question: indexQuestion, 
                                     answer: indexAnswer, 
-                                    url: `<img src='https://opis-cdn.tinkoffjournal.ru/mercury/${eventTarget.files[0].name}` 
+                                    url: `https://opis-cdn.tinkoffjournal.ru/mercury/${eventTarget.files[0].name}` 
                                 }
                             ]
                         }
@@ -225,6 +225,31 @@ export function useQuestionsAnswers() {
         })
     }
 
+    function deleteImageQuestionAnswer(indexQuestion, indexAnswer) {
+        if (indexAnswer !== undefined && dataQuestionsAnswers[indexQuestion].type !== "tile") {
+            setImageDescriptions(prev => {
+                return prev.filter(image => image.question !== indexQuestion || image.answer !== indexAnswer)
+            })
+        } else {
+            setDataQuestionsAnswers(prev => {
+                const steps = [...prev];
+                if (indexAnswer === undefined) {
+                    steps[indexQuestion] = {
+                        ...steps[indexQuestion],
+                        question: steps[indexQuestion].question.filter(obj => obj.type !== "image")
+                    };
+                }
+                if (indexAnswer !== undefined && steps[indexQuestion].type === "tile") { 
+                    steps[indexQuestion].answers[indexAnswer] = { 
+                        ...steps[indexQuestion].answers[indexAnswer], 
+                        backgroundUrl: "" 
+                    };
+                }
+                return steps;
+            })    
+        }
+    }
+
     return {
         dataQuestionsAnswers,
         addQuestion,
@@ -234,6 +259,7 @@ export function useQuestionsAnswers() {
         deleteAnswer,
         changeTypeAnswer,
         addLinkQuestionsAnswers,
-        imageDescriptions
+        imageDescriptions,
+        deleteImageQuestionAnswer
     }
 }
