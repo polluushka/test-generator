@@ -1,10 +1,11 @@
 import { useState } from "react";
 
 import stepTemplate from '../data/step-template.json'
+import { getLocalStorageData } from '../utils/storage';
 
 export function useQuestionsAnswers() {
-    const [dataQuestionsAnswers, setDataQuestionsAnswers] = useState([stepTemplate]);
-    const [imageDescriptions, setImageDescriptions] = useState([]);
+    const [dataQuestionsAnswers, setDataQuestionsAnswers] = useState(getLocalStorageData("questions_answers") ?? [stepTemplate]);
+    const [imageDescriptions, setImageDescriptions] = useState(getLocalStorageData("images_description_answers") ?? []);
 
     function addQuestion() {
         setDataQuestionsAnswers(prev => [
@@ -250,6 +251,10 @@ export function useQuestionsAnswers() {
         }
     }
 
+    function deleteQuestionsAnswersData() {
+        setDataQuestionsAnswers([stepTemplate]);
+    }
+
     return {
         dataQuestionsAnswers,
         addQuestion,
@@ -260,6 +265,7 @@ export function useQuestionsAnswers() {
         changeTypeAnswer,
         addLinkQuestionsAnswers,
         imageDescriptions,
-        deleteImageQuestionAnswer
+        deleteImageQuestionAnswer,
+        deleteQuestionsAnswersData
     }
 }

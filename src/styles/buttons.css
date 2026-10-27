@@ -71,6 +71,15 @@ button {
   border-color: var(--accent-press);
 }
 
+/* GENERATE BUTTON */
+
+.generate {
+  width: 100%;
+  margin-top: 18px;
+  padding: 14px;
+  min-height: 48px;
+}
+
 /* GHOST BUTTON */
 
 .btn-ghost {
@@ -107,25 +116,17 @@ button {
 
 .del {
   flex: none;
-
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   padding: 6px 8px;
-
   background: transparent;
-
   border: 0;
   border-radius: 7px;
-
   color: var(--muted);
-
   cursor: pointer;
-
   font-family: inherit;
   font-size: 13px;
-
   transition:
     color 0.15s ease,
     background 0.15s ease;
@@ -133,15 +134,31 @@ button {
 
 .del:hover {
   color: var(--danger);
-
   background: rgba(255, 107, 107, 0.08);
 }
 
 .del:focus-visible {
   outline: none;
-
   box-shadow:
     0 0 0 3px rgba(255, 107, 107, 0.16);
+}
+
+/* CLEAR BUTTON */
+
+.clear {
+  width: 100%;
+  margin-top: 10px;
+  padding: 14px;
+  min-height: 48px;
+  background: var(--field-raised);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  transition: 0.15s ease;
+}
+
+.clear:hover {
+  color: var(--danger);
+  background: rgba(255, 107, 107, 0.08);
 }
 
 /* COPY BUTTON */

@@ -11,6 +11,7 @@ import AddButton from './components/AddButton';
 import DeleteButton from './components/DeleteButton';
 import PrimaryButton from './components/PrimaryButton';
 import CopyButton from './components/CopyButton';
+import ClearButton from './components/ClearButton';
 
 import templateJSON from './data/template.json'
 
@@ -18,6 +19,7 @@ import { useQuestionsAnswers } from './hooks/useQuestionsAnswers';
 import { useResults } from './hooks/useResults';
 
 import { processText, checkTextList, formatEnding } from './utils/typography';
+import { saveLocalStorageData, clearLocalStorage } from './utils/storage';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
@@ -35,6 +37,7 @@ function App() {
     addLinkQuestionsAnswers,
     imageDescriptions,
     deleteImageQuestionAnswer,
+    deleteQuestionsAnswersData
   } = useQuestionsAnswers();
 
   const {
@@ -44,17 +47,15 @@ function App() {
     deleteResult,
     addLinkResult,
     changeTypeResult,
-    deleteImageResult
+    deleteImageResult,
+    deleteResultsData
   } = useResults();
 
   const [dataConfig, setDataConfig] = useState(templateJSON);
   const [dataConfigEmpty, setDataConfigEmpty] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [selectionValue, setSelectionValue] = useState("");
-  const [focusElem, setFocusElem] = useState({
-    type: "",
-    id: ""
-  });
+  const [focusElem, setFocusElem] = useState({ type: "", id: "" });
 
   function createLink(event) {
     event.preventDefault();
@@ -86,7 +87,7 @@ function App() {
     }
 
     const indexSubstr = text.indexOf(selectionValue);
-    const textLink = `<a href="${data.link_input}">` + text.slice(indexSubstr, indexSubstr + selectionValue.length) + "</a>";
+    const textLink = `<a href='${data.link_input}'>` + text.slice(indexSubstr, indexSubstr + selectionValue.length) + "</a>";
     const formattedText = text.slice(0, indexSubstr) + textLink + text.slice(indexSubstr + selectionValue.length);
 
     if(focusElem.type === "questionTitle" || focusElem.type === "questionDescription"
@@ -152,6 +153,12 @@ function App() {
     );
   }
 
+  function deleteAllData() {
+    clearLocalStorage();
+    deleteQuestionsAnswersData();
+    deleteResultsData();
+  }
+
   useEffect(() => {
     const toogleModal = (event) => {
       if (event.altKey && event.code === "KeyL") {
@@ -175,7 +182,16 @@ function App() {
       document.getElementById("link_input").focus();
       document.body.style.overflow = "hidden";
     } else document.body.style.overflow = "unset";
-  }, [isOpen]);  
+  }, [isOpen]); 
+  
+  useEffect(() => {
+    saveLocalStorageData("questions_answers", JSON.stringify(dataQuestionsAnswers));
+    saveLocalStorageData("images_description_answers", JSON.stringify(imageDescriptions));
+  }, [dataQuestionsAnswers]); 
+
+  useEffect(() => {
+    saveLocalStorageData("results", JSON.stringify(dataResult));
+  }, [dataResult]); 
 
   return (
     <div className="app">
@@ -508,13 +524,14 @@ function App() {
                   name="typeTest" value="category" checked={ "groupNumber" in dataQuestionsAnswers[0].answers[0] }>Категории</Radio>
               </div>
             </div>
-
+            
             <PrimaryButton type="submit" form="test-generator-form">Сгенерировать конфиг</PrimaryButton>
+            <ClearButton onClick={ () => deleteAllData() }>Стереть все</ClearButton>
 
-            <p className="hint">
+            {/* <p className="hint">
               Конфиг собирается вживую по мере заполнения.
               Проверьте, что у каждого вопроса выбран верный ответ.
-            </p>
+            </p> */}
           </Panel>
 
           <Panel classname="panel">

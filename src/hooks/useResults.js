@@ -1,10 +1,11 @@
 import { useState } from "react";
 
 import resultTemplate from '../data/result-template.json'
+import { getLocalStorageData } from '../utils/storage';
 
 export function useResults() {
 
-    const [dataResult, setDataResult] = useState(resultTemplate);
+    const [dataResult, setDataResult] = useState(getLocalStorageData("results") ?? resultTemplate);
 
     function addResult() {
         setDataResult(prev => {
@@ -54,16 +55,16 @@ export function useResults() {
 
     function addLinkResult(focusElem, formattedText) {
         setDataResult(prev => {
-            
-            switch (focusElem.type) {
-                case "resultTitle": 
-                    prev.items[focusElem.id] = { ...prev.items[focusElem.id], title: formattedText }
-                    break;
-                case "resultDescription": 
-                    prev.items[focusElem.id] = { ...prev.items[focusElem.id], description: formattedText }
-                    break;
+            if (focusElem.type === "resultTitle") {
+                return {
+                    ...prev,
+                    items: prev.items.map((item, itemIndex) => {return itemIndex === focusElem.id ? { ...item, title: formattedText } : item})
+                }
             }
-            return prev;
+            return {
+                ...prev,
+                items: prev.items.map((item, itemIndex) => {return itemIndex === focusElem.id ? { ...item, description: formattedText } : item})
+            }
         })
     }
 
@@ -92,6 +93,10 @@ export function useResults() {
         })
     }
 
+    function deleteResultsData() {
+        setDataResult(resultTemplate);
+    }
+
     return {
         dataResult,
         addResult,
@@ -99,6 +104,7 @@ export function useResults() {
         deleteResult,
         addLinkResult,
         changeTypeResult,
-        deleteImageResult
+        deleteImageResult,
+        deleteResultsData
     }
 }
