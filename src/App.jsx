@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from 'react'
+import {  useEffect, useState } from 'react'
 
 import Panel from './components/Panel';
 import Input from './components/Input';
@@ -13,13 +13,13 @@ import PrimaryButton from './components/PrimaryButton';
 import CopyButton from './components/CopyButton';
 import ClearButton from './components/ClearButton';
 
-import templateJSON from './data/template.json'
-
 import { useQuestionsAnswers } from './hooks/useQuestionsAnswers';
 import { useResults } from './hooks/useResults';
+import { useConfig } from './hooks/useConfig';
+import { useDataStorage } from './hooks/useDataStorage';
 
-import { processText, checkTextList, formatEnding } from './utils/typography';
-import { saveLocalStorageData, clearLocalStorage } from './utils/storage';
+import { formatEnding } from './utils/typography';
+import { clearLocalStorage } from './utils/storage';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
@@ -51,8 +51,15 @@ function App() {
     deleteResultsData
   } = useResults();
 
-  const [dataConfig, setDataConfig] = useState(templateJSON);
-  const [dataConfigEmpty, setDataConfigEmpty] = useState(true);
+  const {
+    dataConfig,
+    dataConfigEmpty,
+    updateСonfig,
+    copyConfig
+  } = useConfig();
+
+  useDataStorage({ dataQuestionsAnswers, imageDescriptions, dataResult });
+
   const [isOpen, setIsOpen] = useState(false);
   const [selectionValue, setSelectionValue] = useState("");
   const [focusElem, setFocusElem] = useState({ type: "", id: "" });
@@ -99,58 +106,7 @@ function App() {
 
   function handleSubmit(event) {
     event.preventDefault();
-
-    setDataConfig(prev => {
-        const config = {
-          ...prev, 
-          steps: dataQuestionsAnswers.map((step, stepIndex) => {
-            return {
-              ...step,
-              answers: step.answers.map((answer, answerIndex) => {
-                return {
-                    ...answer,
-                    title: processText(answer.title),
-                    ...("score" in answer && { score: Number(answer.score) }),
-                    ...("groupNumber" in answer && { groupNumber: Number(answer.groupNumber) }),
-                    ...(imageDescriptions.some(obj => obj.question === stepIndex && obj.answer === answerIndex)
-                          ? { description: processText(checkTextList(answer.description)) 
-                            + `<img src='${imageDescriptions.find(obj => obj.question === stepIndex && obj.answer === answerIndex).url}' style='max-width: 100%;'>` } 
-                          : { description: processText(checkTextList(answer.description)) })
-                  }
-              }),
-              question: (step.question.filter(setting => 
-                setting.type === "description" ? (setting.text.length > 0 ? true : false) : true
-              )).map(setting => {
-                return setting.type === "description" 
-                  ? { ...setting, text: processText(checkTextList(setting.text)) } 
-                  : (setting.type === "title" ? { ...setting, text: processText(setting.text) } : setting);
-              })
-            }
-          }),
-          result: {
-            items: dataResult.items.map(item => {
-              return {
-                ...item, 
-                ...("min" in item ? { min: Number(item.min) } : { groupNumber: Number(item.groupNumber) }),
-                title: processText(item.title),
-                description: processText(checkTextList(item.description))
-              }
-            }),
-            isRetakeEnabled: dataResult.isRetakeEnabled,
-            canScrollToFirstError: dataResult.canScrollToFirstError,
-            shouldShowScoreCounter: dataResult.shouldShowScoreCounter
-          }
-        }
-        return config
-    });
-
-    setDataConfigEmpty(false);
-  }
-
-  function copyConfig() {
-    navigator.clipboard.writeText(
-      dataConfigEmpty ? "" : JSON.stringify(dataConfig, null, 2)
-    );
+    updateСonfig(dataQuestionsAnswers, imageDescriptions, dataResult);
   }
 
   function deleteAllData() {
@@ -172,9 +128,7 @@ function App() {
 
     window.addEventListener("keydown", toogleModal);
 
-    return() => {
-      window.removeEventListener("keydown", toogleModal);
-    }
+    return() => { window.removeEventListener("keydown", toogleModal) }
   }, []);
 
   useEffect(() => {
@@ -184,14 +138,11 @@ function App() {
     } else document.body.style.overflow = "unset";
   }, [isOpen]); 
   
-  useEffect(() => {
-    saveLocalStorageData("questions_answers", JSON.stringify(dataQuestionsAnswers));
-    saveLocalStorageData("images_description_answers", JSON.stringify(imageDescriptions));
-  }, [dataQuestionsAnswers]); 
-
-  useEffect(() => {
-    saveLocalStorageData("results", JSON.stringify(dataResult));
-  }, [dataResult]); 
+  function deleteAllData() {
+    clearLocalStorage();
+    deleteQuestionsAnswersData();
+    deleteResultsData();
+  }
 
   return (
     <div className="app">
@@ -258,7 +209,6 @@ function App() {
                       dataQuestionsAnswers.length > 1
                         && (<DeleteButton type="button" onClick={() => deleteQuestion(index_question)}>Удалить</DeleteButton>)
                     }
-                    
                   </div>
 
                   <div className="stack">
