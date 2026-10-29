@@ -165,16 +165,42 @@ export function useQuestionsAnswers() {
 
     function deleteQuestion(indexQuestion) {
         setDataQuestionsAnswers(prev => prev.filter((_, index_step) => index_step !== indexQuestion));
+        if(dataQuestionsAnswers[indexQuestion].type !== "tile") {
+            setImageDescriptions(prev => {
+                const deletedImages = prev.filter(image => image.question === indexQuestion);
+                if(deletedImages.length > 0) {
+                    return prev.filter(image => {
+                        for (let deletedImage of deletedImages) return image.question !== deletedImage.question
+                    }).map(image => {
+                        return image.question >= deletedImages[0].question
+                            ? { ...image, question: image.question - 1 } : image });
+                }
+                
+            });
+        }
     }
 
     function deleteAnswer(indexQuestion, indexAnswer) {
         setDataQuestionsAnswers(prev => 
-        prev.map((step, index_step) => {
-            return index_step === indexQuestion ? {
-            ...step,
-            answers: step.answers.filter((_, indexStepAnswer) => indexStepAnswer !== indexAnswer)
-            } : step;
-        }));
+            prev.map((step, index_step) => {
+                return index_step === indexQuestion ? {
+                ...step,
+                answers: step.answers.filter((_, indexStepAnswer) => indexStepAnswer !== indexAnswer)
+                } : step; 
+            })
+        );
+        if(dataQuestionsAnswers[indexQuestion].type !== "tile") {
+            setImageDescriptions(prev => {
+                const deletedImage = prev.find(image => image.question === indexQuestion && image.answer === indexAnswer);
+                if(deletedImage) {
+                    return prev.filter(image => 
+                        image.question !== indexQuestion || image.answer !== indexAnswer).map(image => {
+                            return image.question === deletedImage.question && image.answer >= deletedImage.answer
+                                ? { ...image, answer: image.answer - 1 } : image })
+                }
+                
+            });
+        }
     }
 
     function changeTypeAnswer(typeTest) {

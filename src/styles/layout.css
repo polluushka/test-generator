@@ -1,0 +1,174 @@
+/* APP */
+
+.app {
+  min-height: 100vh;
+  max-width: 1920px;
+  margin: auto;
+  background: var(--bg);
+  position: relative;
+}
+
+/* TOPBAR */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) 24px 14px;
+  background: rgba(14, 15, 17, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.brand .mark {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--accent);
+  color: #000;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.brand > span:last-child {
+  line-height: 1.2;
+}
+
+.brand small {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.topbar .spacer {
+  flex: 1;
+}
+
+.ghost-tag {
+  flex: none;
+  white-space: nowrap;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-dim);
+  font-size: 12.5px;
+}
+
+/* MAIN LAYOUT */
+
+.wrap {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 24px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 22px;
+  align-items: start;
+}
+
+/* SIDEBAR */
+
+.side {
+  position: sticky;
+  top: 84px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (max-width: 920px) {
+  .topbar {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .wrap {
+    grid-template-columns: 1fr;
+
+    padding: 16px;
+  }
+
+  .side {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    gap: 10px;
+    padding-top: calc(11px + env(safe-area-inset-top, 0px));
+    padding-bottom: 11px;
+  }
+
+  .brand {
+    gap: 9px;
+  }
+
+  .brand .mark {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    font-size: 15px;
+  }
+
+  .brand small {
+    font-size: 11px;
+  }
+
+  .ghost-tag {
+    padding: 5px 9px;
+    font-size: 11px;
+  }
+
+  .wrap {
+    padding: 12px;
+  }
+
+  .side {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 420px) {
+  .topbar {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .brand > span:last-child {
+    font-size: 14px;
+  }
+
+  .brand small {
+    display: none;
+  }
+
+  .ghost-tag {
+    font-size: 10.5px;
+  }
+
+  .wrap {
+    padding: 8px;
+  }
+}

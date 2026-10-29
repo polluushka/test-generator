@@ -1,31 +1,21 @@
-/* DEFAULT BUTTON */
-
 button {
   cursor: pointer;
 }
 
 .btn {
   min-height: 42px;
-
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   gap: 8px;
-
   padding: 11px 18px;
-
   border: 1px solid transparent;
   border-radius: 11px;
-
   font-family: inherit;
   font-size: 14px;
   font-weight: 600;
-
   line-height: 1.2;
-
   cursor: pointer;
-
   transition:
     background 0.15s ease,
     border-color 0.15s ease,
@@ -40,24 +30,19 @@ button {
 
 .btn:focus-visible {
   outline: none;
-
-  box-shadow:
-    0 0 0 3px rgba(255, 221, 45, 0.35);
+  box-shadow: 0 0 0 3px rgba(255, 221, 45, 0.35);
 }
 
 .btn:disabled {
   opacity: 0.5;
-
   cursor: not-allowed;
 }
-
 
 /* PRIMARY BUTTON */
 
 .btn-primary {
   background: var(--accent);
   color: #000;
-
   border-color: var(--accent);
 }
 
@@ -75,6 +60,7 @@ button {
 
 .generate {
   width: 100%;
+  margin-top: 18px;
   padding: 14px;
   min-height: 48px;
 }
@@ -83,17 +69,13 @@ button {
 
 .btn-ghost {
   background: transparent;
-
   color: var(--text);
-
   border-color: var(--border-strong);
 }
 
 .btn-ghost:hover {
   background: rgba(255, 221, 45, 0.05);
-
   border-color: var(--accent);
-
   color: var(--accent);
 }
 
@@ -101,9 +83,7 @@ button {
 
 .btn-add {
   width: 100%;
-
   min-height: 46px;
-
   border-style: dashed;
 }
 
@@ -126,9 +106,7 @@ button {
   cursor: pointer;
   font-family: inherit;
   font-size: 13px;
-  transition:
-    color 0.15s ease,
-    background 0.15s ease;
+  transition: color 0.15s ease, background 0.15s ease;
 }
 
 .del:hover {
@@ -138,8 +116,7 @@ button {
 
 .del:focus-visible {
   outline: none;
-  box-shadow:
-    0 0 0 3px rgba(255, 107, 107, 0.16);
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.16);
 }
 
 /* CLEAR BUTTON */
@@ -164,21 +141,14 @@ button {
 
 .copy {
   flex: none;
-
   padding: 6px 11px;
-
   background: var(--field);
-
   border: 1px solid var(--border);
   border-radius: 8px;
-
   color: var(--text-dim);
-
   cursor: pointer;
-
   font-family: inherit;
   font-size: 12.5px;
-
   transition:
     border-color 0.15s ease,
     color 0.15s ease,
@@ -187,17 +157,13 @@ button {
 
 .copy:hover {
   border-color: var(--accent);
-
   color: var(--accent);
-
   background: rgba(255, 221, 45, 0.04);
 }
 
 .copy:focus-visible {
   outline: none;
-
-  box-shadow:
-    0 0 0 3px rgba(255, 221, 45, 0.2);
+  box-shadow: 0 0 0 3px rgba(255, 221, 45, 0.2);
 }
 
 /* EMPTY BUTTON */

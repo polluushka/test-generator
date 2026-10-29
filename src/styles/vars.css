@@ -1,0 +1,30 @@
+:root {
+  --bg: #0e0f11;
+  --panel: #16181b;
+  --field: #101214;
+  --field-raised: #1b1e22;
+
+  --accent: #ffdd2d;
+  --accent-press: #f0cf1f;
+  --correct: #3ecf8e;
+
+  --text: #f3f3f1;
+  --text-dim: #a2a7ad;
+  --muted: #6c7278;
+
+  --danger: #ff6b6b;
+
+  --border: rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.12);
+
+  --modal-glow: rgba(255, 221, 45, 0.07);
+  --modal-bg: rgba(14, 15, 17, 0.7);
+
+  --radius: 16px;
+  --radius-sm: 11px;
+
+  box-sizing: border-box;
+
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}

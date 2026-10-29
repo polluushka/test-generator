@@ -22,11 +22,13 @@
         margin: 10rem auto;
     }
 }
+
 @media (max-width: 640px) {
     .modal-content {
         width: 80%;
     }
 }
+
 @media (max-width: 420px) {
     .modal-content {
         width: 100%;
@@ -40,5 +42,4 @@
         height: 100%;
         border-radius: 0;
     }
-
 }

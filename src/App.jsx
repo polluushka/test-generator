@@ -94,7 +94,7 @@ function App() {
       || focusElem.type === "answerTitle" || focusElem.type === "answerDescription") addLinkQuestionsAnswers(focusElem, formattedText)
     else addLinkResult(focusElem, formattedText);
 
-    setIsOpen(prev => prev === false ? true : false);
+    setIsOpen(prev => !prev ? true : false);
   }
 
   function handleSubmit(event) {
@@ -165,7 +165,7 @@ function App() {
         const selection = event.target.value.slice(event.target.selectionStart, event.target.selectionEnd);
         if (selection.length > 0) {
           setSelectionValue(selection);
-          setIsOpen(prev => prev === false ? true : false);
+          setIsOpen(prev => !prev ? true : false);
         }
       }
     }
@@ -178,7 +178,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (isOpen === true) {
+    if (isOpen) {
       document.getElementById("link_input").focus();
       document.body.style.overflow = "hidden";
     } else document.body.style.overflow = "unset";
@@ -196,7 +196,7 @@ function App() {
   return (
     <div className="app">
       {
-        isOpen === true &&
+        isOpen &&
         ( <Modal onClick={ () => setIsOpen(false) }>
             <Panel onClick={(e) => e.stopPropagation()}>
 
@@ -393,11 +393,11 @@ function App() {
                               "isCorrect" in answer &&
                               ( <div className="seg truth">
                                   <Radio value="true" id={`true_q${questionNumber}_a${answerNumber}`}
-                                    name={`isCorrect_q${questionNumber}_a${answerNumber}`} checked={ answer.isCorrect === true }
+                                    name={`isCorrect_q${questionNumber}_a${answerNumber}`} checked={ answer.isCorrect }
                                     onChange={ (event) => enterDataQuestionsAnswers(event, index_question, index_answer) }>Верно</Radio>
 
                                   <Radio value="false" id={`false_q${questionNumber}_a${answerNumber}`}
-                                    name={`isCorrect_q${questionNumber}_a${answerNumber}`} checked={ answer.isCorrect === false } 
+                                    name={`isCorrect_q${questionNumber}_a${answerNumber}`} checked={ !answer.isCorrect } 
                                     onChange={ (event) => enterDataQuestionsAnswers(event, index_question, index_answer) }>Неверно</Radio>
                                 </div> )
                             }
