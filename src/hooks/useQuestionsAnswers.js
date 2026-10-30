@@ -174,8 +174,7 @@ export function useQuestionsAnswers() {
                     }).map(image => {
                         return image.question >= deletedImages[0].question
                             ? { ...image, question: image.question - 1 } : image });
-                }
-                
+                } else return prev;
             });
         }
     }
@@ -197,8 +196,7 @@ export function useQuestionsAnswers() {
                         image.question !== indexQuestion || image.answer !== indexAnswer).map(image => {
                             return image.question === deletedImage.question && image.answer >= deletedImage.answer
                                 ? { ...image, answer: image.answer - 1 } : image })
-                }
-                
+                } else return prev;
             });
         }
     }
